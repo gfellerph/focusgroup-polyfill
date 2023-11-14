@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="main.js"></script>
+  </head>
+  <body>
+    <button>First focus</button>
+    <h2>Regular focusgroup</h2>
+    <div focusgroup>
+      <button>Button 1</button>
+      <span>not focusable</span>
+      <button>Button 2</button>
+      <button>Button 3</button>
+      <button>Button 4</button>
+      <button>Button 5</button>
+    </div>
+    <h2>Shadow Dom focusgroup</h2>
+    <div>
+      <template shadowrootmode="open">
+        <div focusgroup>
+          <button>Shadow button 1</button>
+          <button>Shadow button 2</button>
+          <button>Shadow button 3</button>
+          <button>Shadow button 4</button>
+          <button>Shadow button 5</button>
+        </div>
+      </template>
+    </div>
+    <h2>Slotted focusgroup</h2>
+    <div>
+      <template shadowrootmode="open">
+        <div focusgroup>
+          <slot></slot>
+        </div>
+      </template>
+      <button>Shadow button 1</button>
+      <button>Shadow button 2</button>
+      <button>Shadow button 3</button>
+      <button>Shadow button 4</button>
+      <button>Shadow button 5</button>
+    </div>
+    <h2>Not focusgroups</h2>
+    <div>
+      <template shadowrootmode="open">
+        <div>
+          <slot></slot>
+        </div>
+      </template>
+      <button>Shadow button 1</button>
+      <button>Shadow button 2</button>
+    </div>
+    <button>Last focus</button>
+  </body>
+</html>
