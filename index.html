@@ -9,19 +9,56 @@
   </head>
   <body>
     <button>First focus</button>
+
     <h2>Regular focusgroup</h2>
     <div focusgroup>
       <button>Button 1</button>
-      <span>not focusable</span>
       <button>Button 2</button>
       <button>Button 3</button>
       <button>Button 4</button>
       <button>Button 5</button>
     </div>
+
+    <h2>RTL focusgroup</h2>
+    <div dir="rtl" focusgroup>
+      <button>Button 1</button>
+      <button>Button 2</button>
+      <button>Button 3</button>
+      <button>Button 4</button>
+      <button>Button 5</button>
+    </div>
+
+    <h2>Horizontal focusgroup</h2>
+    <div focusgroup="horizontal">
+      <button>Button 1</button>
+      <button>Button 2</button>
+      <button>Button 3</button>
+      <button>Button 4</button>
+      <button>Button 5</button>
+    </div>
+
+    <h2>Vertical focusgroup</h2>
+    <div class="vertical" focusgroup="vertical">
+      <button>Button 1</button>
+      <button>Button 2</button>
+      <button>Button 3</button>
+      <button>Button 4</button>
+      <button>Button 5</button>
+    </div>
+
+    <h2>Wrapping focusgroup</h2>
+    <div focusgroup="wrap">
+      <button>Button 1</button>
+      <button>Button 2</button>
+      <button>Button 3</button>
+      <button>Button 4</button>
+      <button>Button 5</button>
+    </div>
+
     <h2>Shadow Dom focusgroup</h2>
     <div>
       <template shadowrootmode="open">
-        <div focusgroup>
+        <div focusgroup part="shadow">
           <button>Shadow button 1</button>
           <button>Shadow button 2</button>
           <button>Shadow button 3</button>
@@ -30,10 +67,22 @@
         </div>
       </template>
     </div>
-    <h2>Slotted focusgroup</h2>
+
+    <h2>Light dom focusgroup with shadow dom items</h2>
+    <div focusgroup>
+      <template shadowrootmode="open">
+        <button>Shadow button 1</button>
+        <button>Shadow button 2</button>
+        <button>Shadow button 3</button>
+        <button>Shadow button 4</button>
+        <button>Shadow button 5</button>
+      </template>
+    </div>
+
+    <h2>Focusgroup in shadow dom with slotted items</h2>
     <div>
       <template shadowrootmode="open">
-        <div focusgroup>
+        <div focusgroup part="shadow">
           <slot></slot>
         </div>
       </template>
@@ -43,10 +92,119 @@
       <button>Shadow button 4</button>
       <button>Shadow button 5</button>
     </div>
+
+    <h2>Mixed light dom, shadow dom and slotted</h2>
+    <p>Complicated use-case</p>
+    <div focusgroup>
+      <button>1</button>
+      <button>2</button>
+      <span>
+        <template shadowrootmode="open">
+          <span focusgroup="extend" part="shadow">
+            <button>3</button>
+            <button>4</button>
+            <slot></slot>
+          </span>
+        </template>
+        <button>5</button>
+        <button>6</button>
+      </span>
+    </div>
+
+    <h2>Nested focusgroup</h2>
+    <div focusgroup>
+      <button>Button 1</button>
+      <button>Button 2</button>
+      <button>Button 3</button>
+      <div focusgroup="extend">
+        <button>Nested Button 1</button>
+        <button>Nested Button 2</button>
+        <button>Nested Button 3</button>
+        <button>Nested Button 4</button>
+        <button>Nested Button 5</button>
+      </div>
+      <button>Button 4</button>
+      <button>Button 5</button>
+    </div>
+
+    <h2>Nested shadow focusgroup</h2>
+    <div focusgroup>
+      <button>Button 1</button>
+      <button>Button 2</button>
+      <button>Button 3</button>
+      <div>
+        <template shadowrootmode="open">
+          <div focusgroup="extend" part="shadow">
+            <button>Nested Button 1</button>
+            <button>Nested Button 2</button>
+            <button>Nested Button 3</button>
+            <button>Nested Button 4</button>
+            <button>Nested Button 5</button>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <h2>Deeply nested focusgroup</h2>
+    <div focusgroup>
+      <button>Button 1</button>
+      <button>Button 2</button>
+      <button>Button 3</button>
+      <div>
+        <div>
+          <div>
+            <div focusgroup="extend">
+              <button>Nested Button 1</button>
+              <button>Nested Button 2</button>
+              <button>Nested Button 3</button>
+              <button>Nested Button 4</button>
+              <button>Nested Button 5</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button>Button 4</button>
+      <button>Button 5</button>
+    </div>
+
+    <h2>Weird</h2>
+    <div focusgroup>
+      <button>
+        I'm a button with links 1
+        <span focusgroup="extend">
+          <a href="http://">Link 1</a>
+          <a href="http://">Link 2</a>
+          <a href="http://">Link 3</a>
+          <a href="http://">Link 4</a>
+          <a href="http://">Link 5</a>
+        </span>
+      </button>
+      <button>
+        I'm a button with links 2
+        <span focusgroup="extend">
+          <a href="http://">Link 1</a>
+          <a href="http://">Link 2</a>
+          <a href="http://">Link 3</a>
+          <a href="http://">Link 4</a>
+          <a href="http://">Link 5</a>
+        </span>
+      </button>
+      <button>
+        I'm a button with links 3
+        <span focusgroup="extend">
+          <a href="http://">Link 1</a>
+          <a href="http://">Link 2</a>
+          <a href="http://">Link 3</a>
+          <a href="http://">Link 4</a>
+          <a href="http://">Link 5</a>
+        </span>
+      </button>
+    </div>
+
     <h2>Not focusgroups</h2>
     <div>
       <template shadowrootmode="open">
-        <div>
+        <div part="shadow">
           <slot></slot>
         </div>
       </template>

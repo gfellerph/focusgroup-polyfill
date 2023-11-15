@@ -1,0 +1,10 @@
+*::part(shadow) {
+  padding: 0.5rem;
+  background-color: lightgray;
+}
+
+.vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
