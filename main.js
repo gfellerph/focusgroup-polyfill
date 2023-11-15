@@ -77,8 +77,8 @@ function getKeyMap(focusTarget, options) {
   if (options.vertical) {
     map = {
       ...map,
-      ArrowUp: isLTR ? getPreviousCandidate : getNextCandidate,
-      ArrowDown: isLTR ? getNextCandidate : getPreviousCandidate,
+      ArrowUp: getPreviousCandidate,
+      ArrowDown: getNextCandidate,
     };
   }
   return map;
@@ -147,14 +147,6 @@ function getPreviousCandidate(focusTarget, focusGroup, options) {
 }
 
 function getNextCandidate(focusTarget, focusGroup, options) {
-  /**
-   * 1. Walk the tree from here
-   * - If there is a next focusable sibling, return that
-   * - If there is a non-focusable element with children, search for an extended focusgroup
-   * - If there is a shadow dom child, search the shadowroot for an extended focusgroup
-   * - If there is no sibling and current focusgroup is not extended, return null
-   * - If there is no sibling and wrap is enabled, start search again with the first node of the parent focusgroup
-   */
   let nextFocusable = treeWalker(
     focusTarget,
     focusGroup,
@@ -181,7 +173,14 @@ function getNextCandidate(focusTarget, focusGroup, options) {
 }
 
 function treeWalker(node, focusGroup, initialTarget, options, mode = "next") {
-  // debugger;
+  /**
+   * 1. Walk the tree from here
+   * - If there is a next focusable sibling, return that
+   * - If there is a non-focusable element with children, search for an extended focusgroup
+   * - If there is a shadow dom child, search the shadowroot for an extended focusgroup
+   * - If there is no sibling and current focusgroup is not extended, return null
+   * - If there is no sibling and wrap is enabled, start search again with the first node of the parent focusgroup
+   */
   let currentNode = node;
   while (currentNode) {
     if (
