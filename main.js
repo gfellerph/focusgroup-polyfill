@@ -1,5 +1,3 @@
-const visited = new WeakMap();
-
 window.addEventListener("focusin", (e) => {
   if (e.defaultPrevented) return;
   /* console.log("event", e);
@@ -32,7 +30,7 @@ window.addEventListener("focusin", (e) => {
       }
     }
   } */
-  if (focusGroup != null) {
+  if (focusGroup != null && !focusTarget.matches(keyConflictSelector)) {
     focusTarget.addEventListener("keydown", (event) =>
       handleKeydown(event, focusTarget, focusGroup)
     );
@@ -60,6 +58,7 @@ function handleKeydown(event, focusTarget, focusGroup) {
  * @param options.horizontal
  * @param options.vertical
  * @param options.extended
+ * @param options.grid
  * @returns
  */
 function getKeyMap(focusTarget, options) {
@@ -94,10 +93,18 @@ function getFocusTarget(event) {
 }
 
 function getFocusGroup(element) {
-  if (element.parentElement.hasAttribute("focusgroup"))
+  // Direct parent has a focusgroup, easy
+  if (element.parentElement?.hasAttribute("focusgroup")) {
     return element.parentElement;
-  if (element.assignedSlot?.parentElement.hasAttribute("focusgroup"))
+  }
+  // Element is slotted in a focusgroup parent
+  if (element.assignedSlot?.parentElement.hasAttribute("focusgroup")) {
     return element.assignedSlot.parentElement;
+  }
+  // Element is inside a shadow root where the light dom parent has focusgroup
+  if (element.getRootNode()?.host.hasAttribute("focusgroup")) {
+    return element.getRootNode().host;
+  }
   return null;
 }
 
@@ -109,15 +116,23 @@ function getFocusGroup(element) {
  * @returns options.horizontal
  * @returns options.wrap
  * @returns options.extend
+ * @returns options.grid
  */
 function getOptions(focusGroup) {
-  const options = ` ${focusGroup.getAttribute("focusgroup").trim()} `;
-  return {
-    vertical: !options.includes(" horizontal "),
-    horizontal: !options.includes(" vertical "),
-    wrap: options.includes(" wrap "),
-    extend: options.includes(" extend "),
+  const optionsString = ` ${focusGroup.getAttribute("focusgroup").trim()} `;
+  const options = {
+    vertical: optionsString.includes(" vertical "),
+    horizontal: optionsString.includes(" horizontal "),
+    wrap: optionsString.includes(" wrap "),
+    extend: optionsString.includes(" extend "),
+    grid: optionsString.includes(" grid "),
   };
+  // Auto case
+  if (!options.vertical && !options.horizontal) {
+    options.vertical = true;
+    options.horizontal = true;
+  }
+  return options;
 }
 
 function getPreviousCandidate(focusTarget, focusGroup, options) {
@@ -185,12 +200,10 @@ function treeWalker(node, focusGroup, initialTarget, options, mode = "next") {
   while (currentNode) {
     if (
       currentNode !== initialTarget &&
-      currentNode.parentElement.hasAttribute("focusgroup") &&
+      getFocusGroup(currentNode) != null &&
       currentNode.matches(focusableSelector)
     ) {
-      // Clean up
-
-      // Focus
+      // Found a focusable element
       return currentNode;
     }
 
@@ -198,11 +211,14 @@ function treeWalker(node, focusGroup, initialTarget, options, mode = "next") {
       // Found another focusgroup
       const currentOptions = getOptions(currentNode);
       if (currentOptions.extend) {
+        const root =
+          currentNode.shadowRoot == null ? currentNode : currentNode.shadowRoot;
+        const childNode =
+          mode === "next" ? root.firstElementChild : root.lastElementChild;
+
         //debugger;
         return treeWalker(
-          mode === "next"
-            ? currentNode.firstElementChild
-            : currentNode.lastElementChild,
+          childNode,
           currentNode,
           initialTarget,
           currentOptions,
@@ -211,17 +227,14 @@ function treeWalker(node, focusGroup, initialTarget, options, mode = "next") {
       }
     }
 
-    if (currentNode.childElementCount !== 0) {
+    if (currentNode.childElementCount !== 0 || currentNode.shadowRoot != null) {
       //debugger;
-      return treeWalker(
-        mode === "next"
-          ? currentNode.firstElementChild
-          : currentNode.lastElementChild,
-        focusGroup,
-        initialTarget,
-        options,
-        mode
-      );
+      const root =
+        currentNode.shadowRoot == null ? currentNode : currentNode.shadowRoot;
+      const childNode =
+        mode === "next" ? root.firstElementChild : root.lastElementChild;
+
+      return treeWalker(childNode, focusGroup, initialTarget, options, mode);
     }
 
     // TODO: Descent into shadow trees
@@ -238,7 +251,8 @@ function treeWalker(node, focusGroup, initialTarget, options, mode = "next") {
     // debugger;
     // TODO: walk up shadow dom
     // See if siblings are focusable
-    currentNode = initialTarget.parentElement;
+    currentNode =
+      initialTarget.parentElement || initialTarget.getRootNode().host;
     while (currentNode) {
       const nextSibling =
         mode === "next"
@@ -256,7 +270,7 @@ function treeWalker(node, focusGroup, initialTarget, options, mode = "next") {
           return result;
         }
       }
-      currentNode = currentNode.parentElement;
+      currentNode = currentNode.parentElement || currentNode.getRootNode().host;
     }
   }
 
@@ -289,4 +303,14 @@ const focusableSelector = [
   `video[controls]${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}`,
   `[contenteditable]${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}`,
   `area[href]${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}`,
+].join(",");
+
+// These elements already use arrow keys for navigation, tab should be used to exit
+const keyConflictSelector = [
+  'input:is([type="text"],[type="url"],[type="password"],[type="search"],[type="number"],[type="email"],[type="tel"])',
+  "select",
+  "textarea",
+  "audio",
+  "video",
+  "iframe",
 ].join(",");
