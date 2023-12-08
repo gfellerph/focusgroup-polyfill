@@ -3,38 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Focusgroup</title>
     <link rel="stylesheet" href="style.css" />
     <script type="module" src="main.js"></script>
   </head>
   <body>
+    <h1>Testing focusgroups</h1>
+    <p>
+      This is a test page for a focusgroup implementation that works across
+      shadow dom boundaries according to the
+      <a href="https://open-ui.org/components/focusgroup.explainer/"
+        >non active Open UI focusgroup explainer</a
+      >.
+    </p>
     <button>First focus</button>
 
     <h2>Regular focusgroup</h2>
     <div focusgroup>
-      <button>Button 1</button>
-      <button>Button 2</button>
+      <button id="regular-focusgroup-button-1">Button 1</button>
+      <button id="regular-focusgroup-button-2">Button 2</button>
       <button>Button 3</button>
       <button>Button 4</button>
-      <button>Button 5</button>
+      <button id="regular-focusgroup-button-5">Button 5</button>
     </div>
 
     <h2>RTL focusgroup</h2>
     <div dir="rtl" focusgroup>
-      <button>Button 1</button>
-      <button>Button 2</button>
+      <button id="rtl-focusgroup-button-1">Button 1</button>
+      <button id="rtl-focusgroup-button-2">Button 2</button>
       <button>Button 3</button>
       <button>Button 4</button>
-      <button>Button 5</button>
+      <button id="rtl-focusgroup-button-5">Button 5</button>
     </div>
 
     <h2>Horizontal focusgroup</h2>
     <div focusgroup="horizontal">
-      <button>Button 1</button>
-      <button>Button 2</button>
+      <button id="horizontal-focusgroup-button-1">Button 1</button>
+      <button id="horizontal-focusgroup-button-2">Button 2</button>
       <button>Button 3</button>
       <button>Button 4</button>
-      <button>Button 5</button>
+      <button id="horizontal-focusgroup-button-5">Button 5</button>
     </div>
 
     <h2>Vertical focusgroup</h2>
@@ -93,6 +101,11 @@
         Current implementation does not search for same direction next/prev
         elements, therefore this use case is broken
       </li>
+      <li>
+        horizontal direction on the top level is contradicting because a down
+        arrow press should go to the sub-menu but with the horizontal option,
+        down arrow is not active
+      </li>
     </ul>
 
     <h2>Wrapping focusgroup</h2>
@@ -117,6 +130,43 @@
       </template>
     </div>
 
+    <h2>Nested shadow DOM focusgroup</h2>
+    <div>
+      <template shadowrootmode="open">
+        <div focusgroup part="shadow">
+          <button>Shadow button 1</button>
+          <div>
+            <template shadowrootmode="open">
+              <div focusgroup="extend" part="shadow">
+                <button>Shadow button 2</button>
+                <div>
+                  <template shadowrootmode="open">
+                    <div focusgroup="extend" part="shadow">
+                      <button>Shadow button 3</button>
+                      <div>
+                        <template shadowrootmode="open">
+                          <div focusgroup="extend" part="shadow">
+                            <button>Shadow button 4</button>
+                            <div>
+                              <template shadowrootmode="open">
+                                <div focusgroup="extend" part="shadow">
+                                  <button>Shadow button 5</button>
+                                </div>
+                              </template>
+                            </div>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+
     <h2>Light dom focusgroup with shadow dom items</h2>
     <div focusgroup>
       <template shadowrootmode="open">
@@ -131,8 +181,8 @@
     <h2>Focusgroup in shadow dom with slotted items</h2>
     <div>
       <template shadowrootmode="open">
-        <div focusgroup part="shadow">
-          <slot></slot>
+        <div part="shadow">
+          <slot focusgroup></slot>
         </div>
       </template>
       <button>Shadow button 1</button>
@@ -152,7 +202,7 @@
           <span focusgroup="extend" part="shadow">
             <button>3</button>
             <button>4</button>
-            <slot></slot>
+            <slot focusgroup="extend"></slot>
           </span>
         </template>
         <button>5</button>
@@ -266,7 +316,7 @@
       <button>Button 3</button>
       <textarea name="" id="" cols="30" rows="10"></textarea>
       <button>Button 3</button>
-      <audio
+      <!-- <audio
         controls
         src="https://github.com/rafaelreis-hotmart/Audio-Sample-files/raw/master/sample.mp3"
       ></audio>
@@ -281,7 +331,7 @@
           type="video/ogg"
         />
         Your browser does not support HTML video.
-      </video>
+      </video> -->
       <button>Button 3</button>
       <details focusgroup="extend">
         <summary>Summary</summary>
