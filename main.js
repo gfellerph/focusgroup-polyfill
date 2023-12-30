@@ -144,7 +144,7 @@ function getFocusGroup(element) {
 }
 
 /**
- *
+ * Get options of the current focusgroup
  * @param {Element} focusGroup
  * @returns {FocusgroupOptions}
  */
@@ -267,7 +267,7 @@ function treeWalker(node, focusGroup, initialTarget, options, direction, key) {
         : currentNode.previousElementSibling;
   }
 
-  // Focusgroup does not contain any more items, start to ascent the tree if it extends
+  // Focusgroup does not contain any more items, start to ascend the tree if it extends
   if (options.extend) {
     // debugger;
     // TODO: walk up shadow dom
