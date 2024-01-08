@@ -1,4 +1,9 @@
-import tabbable from "https://cdn.jsdelivr.net/npm/tabbable@6.2.0/+esm";
+import {
+  focusableSelector,
+  keyConflictSelector,
+} from "/src/focusable-selectors.js";
+
+import { ShadowWalker } from "/src/shadow-tree-walker.js";
 
 /**
  * Option type for focusgroups
@@ -14,8 +19,8 @@ import tabbable from "https://cdn.jsdelivr.net/npm/tabbable@6.2.0/+esm";
 /**
  * Direction
  * @typedef {object} DIRECTION
- * @property {number} FORWARDS
- * @property {number} BACKWARDS
+ * @property {number} PREVIOUS
+ * @property {number} NEXT
  */
 
 /**
@@ -28,12 +33,17 @@ import tabbable from "https://cdn.jsdelivr.net/npm/tabbable@6.2.0/+esm";
  */
 
 const DIRECTION = {
-  FORWARDS: 0,
-  BACKWARDS: 1,
+  NEXT: 0,
+  PREVIOUS: 1,
 };
 
 const observedRoots = new WeakMap();
 
+/**
+ * Add a focusin listener to a root element to enable
+ * more precise focus target identification
+ * @param {Element} root
+ */
 function registerFocusinListener(root) {
   if (!observedRoots.has(root)) {
     observedRoots.set(root, true);
@@ -45,18 +55,15 @@ function registerFocusinListener(root) {
 registerFocusinListener(window);
 
 function focusInHandler(focusEvent) {
-  //if (focusEvent.defaultPrevented) return;
-
-  // Find the real target of the event, even if it's nested in a shadow-root
+  // Find the real focused element, even if it's nested in a shadow-root
   const activeElement = getActiveElement(focusEvent);
 
   // Check if target is part of a focusgroup
   const focusGroup = getFocusGroup(activeElement);
 
-  // Init
-  // Nested buttons should find the next parent level sibling and enable focus on that
-  // This is not part of the spec and could be optional
+  // If it is, start to handle keydown events
   if (focusGroup != null && !activeElement.matches(keyConflictSelector)) {
+    // Stop bubbling to upper focusgroups to prevent double handling of the event
     focusEvent.stopPropagation();
     activeElement.addEventListener("keydown", (event) =>
       handleKeydown(event, activeElement, focusGroup)
@@ -73,35 +80,39 @@ function handleKeydown(event, focusTarget, focusGroup) {
   const keyMap = getDirection(focusTarget, options);
 
   if (key in keyMap) {
-    // Prevent page scrolling on arrow up/down
-    if (key === "ArrowUp" || key === "ArrowDown") {
-      event.preventDefault();
-    }
-    focusNode(focusTarget, focusGroup, options, key, keyMap[key]);
+    focusNode(focusTarget, focusGroup, options, key, keyMap[key], event);
   }
 }
 
 /**
  * Figure out in which direction to walk the DOM tree
  * @param {Element} focusTarget
- * @param {FocusgroupOptions} options
  * @returns {DirectionMap} Direction mappings
- *
  */
-function getDirection(focusTarget) {
+function getDirection(focusTarget, options) {
   const isLTR = getComputedStyle(focusTarget).direction === "ltr";
 
-  // Set directional event handlers
-  return {
-    ArrowLeft: isLTR ? DIRECTION.BACKWARDS : DIRECTION.FORWARDS,
-    ArrowRight: isLTR ? DIRECTION.FORWARDS : DIRECTION.BACKWARDS,
-    ArrowUp: DIRECTION.BACKWARDS,
-    ArrowDown: DIRECTION.FORWARDS,
-  };
+  let directions = {};
+  if (options.horizontal) {
+    directions = {
+      ...directions,
+      ArrowLeft: isLTR ? DIRECTION.PREVIOUS : DIRECTION.NEXT,
+      ArrowRight: isLTR ? DIRECTION.NEXT : DIRECTION.PREVIOUS,
+    };
+  }
+  if (options.vertical) {
+    directions = {
+      ...directions,
+      ArrowUp: DIRECTION.PREVIOUS,
+      ArrowDown: DIRECTION.NEXT,
+    };
+  }
+
+  return directions;
 }
 
 /**
- *
+ * Find the active element, even in shadow roots
  * @param {Event} event
  * @returns {Element}
  */
@@ -127,20 +138,20 @@ function getActiveElement(event) {
   }
 }
 
+/**
+ * Find the focusgroup element, across shadow roots
+ * @param {Element} element
+ * @returns {Element|null} The focusgroup element or null if the input element is not part of a focusgroup
+ */
 function getFocusGroup(element) {
-  // Direct parent has a focusgroup, easy
-  if (element.parentElement?.hasAttribute("focusgroup")) {
-    return element.parentElement;
+  const walker = new ShadowWalker(element);
+  const parentNode = walker.parentNode();
+
+  if (parentNode?.hasAttribute("focusgroup")) {
+    return parentNode;
+  } else {
+    return null;
   }
-  // Element is slotted in a focusgroup parent
-  if (element.assignedSlot?.hasAttribute("focusgroup")) {
-    return element.assignedSlot.parentElement;
-  }
-  // Element is inside a shadow root where the light dom parent has focusgroup
-  if (element.getRootNode()?.host?.hasAttribute("focusgroup")) {
-    return element.getRootNode().host;
-  }
-  return null;
 }
 
 /**
@@ -166,7 +177,14 @@ function getOptions(focusGroup) {
   return options;
 }
 
-function focusNode(activeElement, activeFocusGroup, options, key, direction) {
+function focusNode(
+  activeElement,
+  activeFocusGroup,
+  options,
+  key,
+  direction,
+  event
+) {
   let nodeToFocus = treeWalker(
     activeElement,
     activeFocusGroup,
@@ -178,7 +196,7 @@ function focusNode(activeElement, activeFocusGroup, options, key, direction) {
 
   if (nodeToFocus == null && options.wrap) {
     nodeToFocus = treeWalker(
-      direction === DIRECTION.FORWARDS
+      direction === DIRECTION.NEXT
         ? activeFocusGroup.firstElementChild
         : activeFocusGroup.lastElementChild,
       activeFocusGroup,
@@ -190,6 +208,8 @@ function focusNode(activeElement, activeFocusGroup, options, key, direction) {
   }
 
   if (nodeToFocus != null) {
+    // Key event is handled by the focusgroup, prevent other default events
+    event.preventDefault();
     setFocus(nodeToFocus, activeElement);
   }
 }
@@ -206,6 +226,7 @@ function treeWalker(node, focusGroup, initialTarget, options, direction, key) {
    * - If there is a non-focusable element with children, search for an extended focusgroup
    * - If there is a shadow dom child, search the shadowroot for an extended focusgroup
    * - If there is no sibling and current focusgroup is not extended, return null
+   * - If current focusgroup is extended, search for the parent focusgroups next sibling
    * - If there is no sibling and wrap is enabled, start search again with the first node of the parent focusgroup
    */
   let currentNode = node;
@@ -226,7 +247,7 @@ function treeWalker(node, focusGroup, initialTarget, options, direction, key) {
         const root =
           currentNode.shadowRoot == null ? currentNode : currentNode.shadowRoot;
         const childNode =
-          direction === DIRECTION.FORWARDS
+          direction === DIRECTION.NEXT
             ? root.firstElementChild
             : root.lastElementChild;
 
@@ -242,11 +263,10 @@ function treeWalker(node, focusGroup, initialTarget, options, direction, key) {
     }
 
     if (currentNode.childElementCount !== 0 || currentNode.shadowRoot != null) {
-      //debugger;
       const root =
         currentNode.shadowRoot == null ? currentNode : currentNode.shadowRoot;
       const childNode =
-        direction === DIRECTION.FORWARDS
+        direction === DIRECTION.NEXT
           ? root.firstElementChild
           : root.lastElementChild;
 
@@ -262,7 +282,7 @@ function treeWalker(node, focusGroup, initialTarget, options, direction, key) {
 
     // Move prev/next sibling
     currentNode =
-      direction === DIRECTION.FORWARDS
+      direction === DIRECTION.NEXT
         ? currentNode.nextElementSibling
         : currentNode.previousElementSibling;
   }
@@ -276,7 +296,7 @@ function treeWalker(node, focusGroup, initialTarget, options, direction, key) {
       initialTarget.parentElement || initialTarget.getRootNode().host;
     while (currentNode) {
       const nextSibling =
-        direction === DIRECTION.FORWARDS
+        direction === DIRECTION.NEXT
           ? currentNode.nextElementSibling
           : currentNode.previousElementSibling;
       if (nextSibling) {
@@ -299,40 +319,3 @@ function treeWalker(node, focusGroup, initialTarget, options, direction, key) {
   // Found nothing
   return null;
 }
-
-// Credit:
-// https://github.com/KittyGiraudel/focusable-selectors/blob/main/index.js
-const notFocusableSelectorPart = {
-  inert: ":not([inert]):not([inert] *)",
-  negTabIndex: ':not([tabindex^="-"])',
-  disabled: ":not(:disabled)",
-};
-
-const focusableSelector = [
-  `button${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}${notFocusableSelectorPart.disabled}`,
-  `a[href]${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}`,
-  `input:not([type="hidden"]):not([type="radio"])${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}${notFocusableSelectorPart.disabled}`,
-  `input[type="radio"]${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}${notFocusableSelectorPart.disabled}`,
-  `[tabindex]${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}`,
-  `select${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}${notFocusableSelectorPart.disabled}`,
-  `textarea${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}${notFocusableSelectorPart.disabled}`,
-  `details${notFocusableSelectorPart.inert} > summary:first-of-type${notFocusableSelectorPart.negTabIndex}`,
-  // Discard until Firefox supports `:has()`
-  // See: https://github.com/KittyGiraudel/focusable-selectors/issues/12
-  // `details:not(:has(> summary))${not.inert}${not.negTabIndex}`,
-  `iframe${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}`,
-  `audio[controls]${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}`,
-  `video[controls]${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}`,
-  `[contenteditable]${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}`,
-  `area[href]${notFocusableSelectorPart.inert}${notFocusableSelectorPart.negTabIndex}`,
-].join(",");
-
-// These elements already use arrow keys for navigation, tab should be used to exit
-const keyConflictSelector = [
-  'input:is([type="text"],[type="url"],[type="password"],[type="search"],[type="number"],[type="email"],[type="tel"])',
-  "select",
-  "textarea",
-  "audio",
-  "video",
-  "iframe",
-].join(",");

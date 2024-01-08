@@ -34,3 +34,14 @@ test("Vertical focusgroup does not wrap left", async ({ page }) => {
   await page.locator("#vertical-focusgroup-button-1").press("ArrowUp");
   await expect(page.locator("#vertical-focusgroup-button-1")).toBeFocused();
 });
+
+test("Pressing down arrow on last element scrolls the page", async ({
+  page,
+}) => {
+  const scrollTopBefore = await page.evaluate(() => window.scrollY);
+  // Why does it not work with only one arrow press?
+  await page.locator("#vertical-focusgroup-button-5").press("ArrowDown");
+  await page.locator("#vertical-focusgroup-button-5").press("ArrowDown");
+  const scrollTopAfter = await page.evaluate(() => window.scrollY);
+  expect(scrollTopAfter).toBeGreaterThan(scrollTopBefore);
+});
