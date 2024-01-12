@@ -1,9 +1,20 @@
 import {
   focusableSelector,
   keyConflictSelector,
-} from "/src/focusable-selectors.js";
-
-import { ShadowWalker } from "/src/shadow-tree-walker.js";
+} from "./src/focusable-selectors.js";
+import {
+  ShadowWalker,
+  getFirstChild,
+  isFocusgroup,
+  isFocusgroupCandidate,
+  getChildren,
+  getParent,
+  getRoot,
+  getOptions,
+  getAncestorFocusgroup,
+  getNestedFocusgroups,
+  getLastChild,
+} from "./src/shadow-tree-walker.js";
 
 /**
  * Option type for focusgroups
@@ -11,7 +22,7 @@ import { ShadowWalker } from "/src/shadow-tree-walker.js";
  * @property {boolean} wrap
  * @property {boolean} horizontal
  * @property {boolean} vertical
- * @property {boolean} extended
+ * @property {boolean} extend
  * @property {boolean} grid
  * @property {boolean} auto
  */
@@ -38,6 +49,7 @@ const DIRECTION = {
 };
 
 const observedRoots = new WeakMap();
+const initializedFocusgroups = new WeakMap();
 
 /**
  * Add a focusin listener to a root element to enable
@@ -65,6 +77,7 @@ function focusInHandler(focusEvent) {
   if (focusGroup != null && !activeElement.matches(keyConflictSelector)) {
     // Stop bubbling to upper focusgroups to prevent double handling of the event
     focusEvent.stopPropagation();
+    setTabindices(activeElement, focusGroup, getOptions(focusGroup));
     activeElement.addEventListener("keydown", (event) =>
       handleKeydown(event, activeElement, focusGroup)
     );
@@ -154,29 +167,6 @@ function getFocusGroup(element) {
   }
 }
 
-/**
- * Get options of the current focusgroup
- * @param {Element} focusGroup
- * @returns {FocusgroupOptions}
- */
-function getOptions(focusGroup) {
-  const optionsString = ` ${focusGroup.getAttribute("focusgroup").trim()} `;
-  const options = {
-    auto: optionsString.includes(" auto "),
-    vertical: optionsString.includes(" vertical "),
-    horizontal: optionsString.includes(" horizontal "),
-    wrap: optionsString.includes(" wrap "),
-    extend: optionsString.includes(" extend "),
-    grid: optionsString.includes(" grid "),
-  };
-  // Auto case
-  if ((!options.vertical && !options.horizontal) || options.auto) {
-    options.vertical = true;
-    options.horizontal = true;
-  }
-  return options;
-}
-
 function focusNode(
   activeElement,
   activeFocusGroup,
@@ -210,11 +200,15 @@ function focusNode(
   if (nodeToFocus != null) {
     // Key event is handled by the focusgroup, prevent other default events
     event.preventDefault();
-    setFocus(nodeToFocus, activeElement);
+    setFocus(nodeToFocus, activeElement, activeFocusGroup);
   }
 }
 
-function setFocus(target, previousTarget) {
+function setFocus(target, previousTarget, focusGroup) {
+  // Refresh last target for focusgroup
+  initializedFocusgroups.set(focusGroup, target);
+  previousTarget.setAttribute("tabindex", "-1");
+  target.setAttribute("tabindex", "0");
   previousTarget.removeEventListener("keydown", handleKeydown);
   target.focus();
 }
@@ -229,27 +223,72 @@ function treeWalker(node, focusGroup, initialTarget, options, direction, key) {
    * - If current focusgroup is extended, search for the parent focusgroups next sibling
    * - If there is no sibling and wrap is enabled, start search again with the first node of the parent focusgroup
    */
-  let currentNode = node;
+
+  const walk = (element) => {
+    let currentElement = element;
+    while (currentElement) {
+      // Check if we have a match
+      if (
+        isFocusgroupCandidate(currentElement) &&
+        currentElement.matches(focusableSelector)
+      ) {
+        // TODO: only return if
+        // 1. this belongs to the original focusgroup, or
+        // 2. an extended focusgroup that is not the original one goes in the same direction
+        return currentElement;
+      }
+
+      // Check if there are nested elements
+      const child = DIRECTION.NEXT
+        ? getFirstChild(currentElement)
+        : getLastChild(currentElement);
+      if (child != null) {
+        return walk(child);
+      }
+
+      currentElement = DIRECTION.NEXT
+        ? currentElement.nextElementSibling
+        : currentElement.previousElementSibling;
+    }
+  };
+
+  // Define starting node
+  const currenNode =
+    direction === DIRECTION.NEXT
+      ? getFirstChild(node) || node.nextElementSibling
+      : getLastChild(node) || node.previousElementSibling;
+  return walk(currenNode);
+
   while (currentNode) {
-    if (
-      currentNode !== initialTarget &&
-      getFocusGroup(currentNode) != null &&
-      currentNode.matches(focusableSelector)
-    ) {
+    if (isFocusgroupCandidate() && currentNode.matches(focusableSelector)) {
       // Found a focusable element belonging to a focusgroup
       return currentNode;
     }
 
-    if (currentNode.hasAttribute("focusgroup")) {
-      // Found another focusgroup
-      const currentOptions = getOptions(currentNode);
+    // Check if current node has children
+    const childNode =
+      direction === DIRECTION.NEXT
+        ? getFirstChild(currentNode)
+        : getLastChild(currentNode);
+    if (childNode != null) {
+      return treeWalker(
+        childNode,
+        focusGroup,
+        initialTarget,
+        options,
+        direction,
+        key
+      );
+    }
+
+    // Check if currenNode is another focusgroup
+    if (walker.isFocusgroup()) {
+      const currentOptions = getOptions(walker.currentNode);
       if (currentOptions.extend) {
-        const root =
-          currentNode.shadowRoot == null ? currentNode : currentNode.shadowRoot;
         const childNode =
           direction === DIRECTION.NEXT
-            ? root.firstElementChild
-            : root.lastElementChild;
+            ? walker.firstChild()
+            : walker.lastChild();
 
         return treeWalker(
           childNode,
@@ -262,34 +301,15 @@ function treeWalker(node, focusGroup, initialTarget, options, direction, key) {
       }
     }
 
-    if (currentNode.childElementCount !== 0 || currentNode.shadowRoot != null) {
-      const root =
-        currentNode.shadowRoot == null ? currentNode : currentNode.shadowRoot;
-      const childNode =
-        direction === DIRECTION.NEXT
-          ? root.firstElementChild
-          : root.lastElementChild;
-
-      return treeWalker(
-        childNode,
-        focusGroup,
-        initialTarget,
-        options,
-        direction,
-        key
-      );
-    }
-
     // Move prev/next sibling
     currentNode =
       direction === DIRECTION.NEXT
-        ? currentNode.nextElementSibling
-        : currentNode.previousElementSibling;
+        ? walker.nextSibling()
+        : walker.previousSibling();
   }
 
   // Focusgroup does not contain any more items, start to ascend the tree if it extends
   if (options.extend) {
-    // debugger;
     // TODO: walk up shadow dom
     // See if siblings are focusable
     currentNode =
@@ -318,4 +338,28 @@ function treeWalker(node, focusGroup, initialTarget, options, direction, key) {
 
   // Found nothing
   return null;
+}
+
+function setTabindices(target, focusgroup) {
+  if (initializedFocusgroups.has(focusgroup)) {
+    // Focusgroup was alerady initialized
+    return;
+  }
+  const ancestorFocusgroup = getAncestorFocusgroup(focusgroup);
+  initializedFocusgroups.set(ancestorFocusgroup, target);
+
+  disableFocusOnChildren(ancestorFocusgroup, target);
+
+  // Search for extended focusgroups and set tab indices on them as well (every child)
+  getNestedFocusgroups(ancestorFocusgroup).forEach((group) => {
+    disableFocusOnChildren(group);
+  });
+}
+
+function disableFocusOnChildren(element, targetElement = null) {
+  Array.from(getChildren(element)).forEach((child) => {
+    if (child !== targetElement && child.matches(focusableSelector)) {
+      child.setAttribute("tabindex", "-1");
+    }
+  });
 }
