@@ -3,17 +3,16 @@ import {
   keyConflictSelector,
 } from "./src/focusable-selectors.js";
 import {
-  ShadowWalker,
   getFirstChild,
-  isFocusgroup,
   isFocusgroupCandidate,
   getChildren,
-  getParent,
-  getRoot,
   getOptions,
   getAncestorFocusgroup,
   getNestedFocusgroups,
   getLastChild,
+  DIRECTION,
+  getParent,
+  findNestedCandidate,
 } from "./src/shadow-tree-walker.js";
 
 /**
@@ -28,13 +27,6 @@ import {
  */
 
 /**
- * Direction
- * @typedef {object} DIRECTION
- * @property {number} PREVIOUS
- * @property {number} NEXT
- */
-
-/**
  * Direction map
  * @typedef {object} DirectionMap
  * @property {DIRECTION} ArrowUp
@@ -42,11 +34,6 @@ import {
  * @property {DIRECTION} ArrowDown
  * @property {DIRECTION} ArrowLeft
  */
-
-const DIRECTION = {
-  NEXT: 0,
-  PREVIOUS: 1,
-};
 
 const observedRoots = new WeakMap();
 const initializedFocusgroups = new WeakMap();
@@ -157,8 +144,7 @@ function getActiveElement(event) {
  * @returns {Element|null} The focusgroup element or null if the input element is not part of a focusgroup
  */
 function getFocusGroup(element) {
-  const walker = new ShadowWalker(element);
-  const parentNode = walker.parentNode();
+  const parentNode = getParent(element);
 
   if (parentNode?.hasAttribute("focusgroup")) {
     return parentNode;
@@ -224,40 +210,17 @@ function treeWalker(node, focusGroup, initialTarget, options, direction, key) {
    * - If there is no sibling and wrap is enabled, start search again with the first node of the parent focusgroup
    */
 
-  const walk = (element) => {
-    let currentElement = element;
-    while (currentElement) {
-      // Check if we have a match
-      if (
-        isFocusgroupCandidate(currentElement) &&
-        currentElement.matches(focusableSelector)
-      ) {
-        // TODO: only return if
-        // 1. this belongs to the original focusgroup, or
-        // 2. an extended focusgroup that is not the original one goes in the same direction
-        return currentElement;
-      }
+  /*
+   * 1. Search current node for focusable children
+   * 2. Search sibling nodes + their children
+   * 3. Search silbings of parent + their children
+   */
+  
+  let candidate = findNestedCandidate(node);
 
-      // Check if there are nested elements
-      const child = DIRECTION.NEXT
-        ? getFirstChild(currentElement)
-        : getLastChild(currentElement);
-      if (child != null) {
-        return walk(child);
-      }
-
-      currentElement = DIRECTION.NEXT
-        ? currentElement.nextElementSibling
-        : currentElement.previousElementSibling;
-    }
-  };
-
-  // Define starting node
-  const currenNode =
-    direction === DIRECTION.NEXT
-      ? getFirstChild(node) || node.nextElementSibling
-      : getLastChild(node) || node.previousElementSibling;
-  return walk(currenNode);
+  if (!candidate) {
+    
+  }
 
   while (currentNode) {
     if (isFocusgroupCandidate() && currentNode.matches(focusableSelector)) {

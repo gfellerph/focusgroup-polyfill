@@ -1,122 +1,15 @@
+import { focusableSelector } from "./focusable-selectors";
+
 /**
- * A tree walker that crosses shadow dom roots
- * @class
- * @constructor
+ * Direction
+ * @typedef {object} DIRECTION
+ * @property {number} PREVIOUS
+ * @property {number} NEXT
  */
-export class ShadowWalker {
-  /**
-   * The currently selected node
-   * @type {Element|null}
-   */
-  currentNode = null;
-
-  /**
-   *
-   * @param {Element} node
-   */
-  constructor(node) {
-    if (node instanceof Element) {
-      this.currentNode = node;
-    }
-  }
-
-  get #parentNode() {
-    if (this.currentNode.assignedSlot !== null) {
-      return this.currentNode.assignedSlot;
-    }
-
-    let parentNode = this.currentNode.parentElement;
-
-    if (parentNode === null) {
-      parentNode = this.currentNode.getRootNode()?.host;
-    }
-
-    return parentNode;
-  }
-
-  /**
-   * Selects the parent node
-   * @returns {Element|null}
-   */
-  parentNode() {
-    const parentNode = this.#parentNode;
-
-    if (parentNode !== null) {
-      this.currentNode = parentNode;
-    }
-
-    return parentNode;
-  }
-
-  get #root() {
-    return this.currentNode.shadowRoot || this.currentNode;
-  }
-
-  get #hasChildren() {
-    return this.currentNode.childElementCount > 0;
-  }
-
-  firstChild() {
-    if (!this.#hasChildren) {
-      return null;
-    }
-
-    this.currentNode = this.#root.firstElementChild;
-
-    return this.currentNode;
-  }
-
-  lastChild() {
-    if (!this.#hasChildren) {
-      return null;
-    }
-
-    this.currentNode = this.#root.lastElementChild;
-
-    return this.currentNode;
-  }
-
-  children() {
-    if (!this.#hasChildren) {
-      return null;
-    }
-
-    return this.#root.children;
-  }
-
-  previousSibling() {
-    const previousSibling = this.currentNode.previousElementSibling;
-    if (previousSibling !== null) {
-      this.currentNode = previousSibling;
-    }
-    return previousSibling;
-  }
-
-  nextSibling() {
-    const nextSibling = this.currentNode.nextElementSibling;
-    if (nextSibling !== null) {
-      this.currentNode = nextSibling;
-    }
-    return nextSibling;
-  }
-
-  /**
-   *
-   * @returns {boolean}
-   */
-  isFocusgroup() {
-    return this.currentNode.hasAttribute("focusgroup");
-  }
-
-  /**
-   *
-   * @returns {boolean}
-   */
-  isFocusgroupCandidate() {
-    const parentNode = this.#parentNode;
-    return !!(parentNode && parentNode.hasAttribute("focusgroup"));
-  }
-}
+export const DIRECTION = {
+  NEXT: 0,
+  PREVIOUS: 1,
+};
 
 /**
  *
@@ -272,4 +165,50 @@ export const getNestedFocusgroups = (startNode) => {
   findNestedFocusgroups(getFirstChild(startNode));
 
   return focusgroups;
+};
+
+/**
+ *
+ * @param {Element} startNode
+ * @param {DIRECTION} direction
+ * @returns {Element | null}
+ */
+export const findNestedCandidate = (startNode, direction) => {
+  const findNestedFocusable = (element) => {
+    let currentElement = element;
+
+    while (currentElement) {
+      // Check if we have a match
+      if (
+        isFocusgroupCandidate(currentElement) &&
+        currentElement.matches(focusableSelector)
+      ) {
+        // TODO: only return if
+        // 1. this belongs to the original focusgroup, or
+        // 2. an extended focusgroup that is not the original one goes in the same direction
+        return currentElement;
+      }
+
+      // Check if there are nested elements
+      const child = DIRECTION.NEXT
+        ? getFirstChild(currentElement)
+        : getLastChild(currentElement);
+      if (child != null) {
+        return findNestedFocusable(child);
+      }
+
+      currentElement = DIRECTION.NEXT
+        ? currentElement.nextElementSibling
+        : currentElement.previousElementSibling;
+    }
+
+    return currentElement;
+  };
+
+  // Define starting node
+  const currenNode =
+    direction === DIRECTION.NEXT
+      ? getFirstChild(startNode) || startNode.nextElementSibling
+      : getLastChild(startNode) || startNode.previousElementSibling;
+  return findNestedFocusable(currenNode);
 };
