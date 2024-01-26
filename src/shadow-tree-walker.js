@@ -1,4 +1,4 @@
-import { focusableSelector } from "./focusable-selectors";
+import { focusableSelector } from "/src/focusable-selectors.js";
 
 /**
  * Direction
@@ -47,7 +47,12 @@ export const getRoot = (element) => {
  * @returns {HTMLCollection | null}
  */
 export const getChildren = (element) => {
-  return getRoot(element).children;
+  const root = getRoot(element);
+  if ("assignedElements" in element) {
+    return root.assignedElements();
+  } else {
+    return root.children;
+  }
 };
 
 /**
@@ -79,7 +84,11 @@ export const getParent = (element) => {
  * @returns {Element | null}
  */
 export const getFirstChild = (element) => {
-  return getRoot(element)?.firstElementChild;
+  const children = getChildren(element);
+  if (children?.length > 0) {
+    return children[0];
+  }
+  return null;
 };
 
 /**
@@ -88,7 +97,50 @@ export const getFirstChild = (element) => {
  * @returns {Element | null}
  */
 export const getLastChild = (element) => {
-  return getRoot(element)?.lastElementChild;
+  const children = getChildren(element);
+  if (children?.length > 0) {
+    return children[children.length - 1];
+  }
+  return null;
+};
+
+/**
+ * Find the nearest parent focusgroup
+ * @param {Element} element
+ * @returns {Element | null}
+ */
+export const getParentFocusgroup = (element) => {
+  let currentElement = getParent(element);
+
+  while (currentElement != null) {
+    if (isFocusgroup(currentElement)) {
+      return currentElement;
+    }
+
+    currentElement = getParent(currentElement);
+  }
+
+  return null;
+};
+
+/**
+ * Gets the parent node that is part of a parent focusgroup
+ * @param {Element} element
+ * @returns {Element | null}
+ */
+export const getContainerNodeOfNearestParentFocusgroup = (element) => {
+  let currentElement = element;
+
+  while (currentElement != null) {
+    const currentParent = getParent(currentElement);
+    if (isFocusgroup(currentParent)) {
+      return currentElement;
+    }
+
+    currentElement = currentParent;
+  }
+
+  return null;
 };
 
 /**
@@ -170,45 +222,38 @@ export const getNestedFocusgroups = (startNode) => {
 /**
  *
  * @param {Element} startNode
- * @param {DIRECTION} direction
+ * @param {number} direction
  * @returns {Element | null}
  */
-export const findNestedCandidate = (startNode, direction) => {
-  const findNestedFocusable = (element) => {
-    let currentElement = element;
+export const findNestedCandidate = (element, direction) => {
+  let currentElement = element;
 
-    while (currentElement) {
-      // Check if we have a match
-      if (
-        isFocusgroupCandidate(currentElement) &&
-        currentElement.matches(focusableSelector)
-      ) {
-        // TODO: only return if
-        // 1. this belongs to the original focusgroup, or
-        // 2. an extended focusgroup that is not the original one goes in the same direction
-        return currentElement;
-      }
-
-      // Check if there are nested elements
-      const child = DIRECTION.NEXT
-        ? getFirstChild(currentElement)
-        : getLastChild(currentElement);
-      if (child != null) {
-        return findNestedFocusable(child);
-      }
-
-      currentElement = DIRECTION.NEXT
-        ? currentElement.nextElementSibling
-        : currentElement.previousElementSibling;
+  while (currentElement) {
+    // Check if we have a match
+    if (
+      isFocusgroupCandidate(currentElement) &&
+      currentElement.matches(focusableSelector)
+    ) {
+      // TODO: only return if
+      // 1. this belongs to the original focusgroup, or
+      // 2. an extended focusgroup that is not the original one goes in the same direction
+      return currentElement;
     }
 
-    return currentElement;
-  };
+    // Check if there are nested elements
+    const child =
+      DIRECTION.NEXT === direction
+        ? getFirstChild(currentElement)
+        : getLastChild(currentElement);
+    if (child != null) {
+      return findNestedCandidate(child, direction);
+    }
 
-  // Define starting node
-  const currenNode =
-    direction === DIRECTION.NEXT
-      ? getFirstChild(startNode) || startNode.nextElementSibling
-      : getLastChild(startNode) || startNode.previousElementSibling;
-  return findNestedFocusable(currenNode);
+    currentElement =
+      DIRECTION.NEXT === direction
+        ? currentElement.nextElementSibling
+        : currentElement.previousElementSibling;
+  }
+
+  return currentElement;
 };

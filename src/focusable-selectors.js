@@ -2,7 +2,7 @@
 // https://github.com/KittyGiraudel/focusable-selectors/blob/main/index.js
 const notFocusableSelectorPart = {
   inert: ":not([inert]):not([inert] *)",
-  negTabIndex: ':not([tabindex^="-"])',
+  negTabIndex: "", // Focusgroup uses negative tabindex to skip other candidates in focus order
   disabled: ":not(:disabled)",
 };
 

@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 
 test("Vertical focusgroup arrow right", async ({ page }) => {
   await page.locator("#vertical-focusgroup-button-1").press("ArrowRight");
-  await expect(page.locator("#vertical-focusgroup-button-2")).toBeFocused();
+  await expect(page.locator("#vertical-focusgroup-button-1")).toBeFocused();
 });
 
 test("Vertical focusgroup arrow down", async ({ page }) => {

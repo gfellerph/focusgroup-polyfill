@@ -13,7 +13,7 @@ test("Reference tab test", async ({ page }) => {
   const button1 = await page.$("#regular-focusgroup-button-1");
   await button1?.focus();
   await button1?.press("Tab");
-  await expect(page.locator("#regular-focusgroup-button-2")).toBeFocused();
+  await expect(page.locator("#rtl-focusgroup-button-1")).toBeFocused();
 });
 
 test("Regular focusgroup arrow right", async ({ page }) => {

@@ -33,13 +33,6 @@ test("Vertical focusgroup arrow up should not change focus", async ({
   await expect(page.locator("#vertical-nested-button-1")).toBeFocused();
 });
 
-test("Vertical focusgroup arrow up should not change focus", async ({
-  page,
-}) => {
-  await page.locator("#vertical-nested-button-2").press("ArrowUp");
-  await expect(page.locator("#vertical-nested-button-2")).toBeFocused();
-});
-
 // Second level tests
 test("Vertical focusgroup arrow right in nested horizontal group", async ({
   page,

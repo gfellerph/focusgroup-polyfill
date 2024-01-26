@@ -1,10 +1,9 @@
 import {
   focusableSelector,
   keyConflictSelector,
-} from "./src/focusable-selectors.js";
+} from "/src/focusable-selectors.js";
 import {
   getFirstChild,
-  isFocusgroupCandidate,
   getChildren,
   getOptions,
   getAncestorFocusgroup,
@@ -13,7 +12,8 @@ import {
   DIRECTION,
   getParent,
   findNestedCandidate,
-} from "./src/shadow-tree-walker.js";
+  getContainerNodeOfNearestParentFocusgroup,
+} from "/src/shadow-tree-walker.js";
 
 /**
  * Option type for focusgroups
@@ -164,22 +164,16 @@ function focusNode(
   let nodeToFocus = treeWalker(
     activeElement,
     activeFocusGroup,
-    activeElement,
     options,
-    direction,
-    key
+    direction
   );
 
   if (nodeToFocus == null && options.wrap) {
     nodeToFocus = treeWalker(
-      direction === DIRECTION.NEXT
-        ? activeFocusGroup.firstElementChild
-        : activeFocusGroup.lastElementChild,
       activeFocusGroup,
-      activeElement,
+      activeFocusGroup,
       options,
-      direction,
-      key
+      direction
     );
   }
 
@@ -199,103 +193,56 @@ function setFocus(target, previousTarget, focusGroup) {
   target.focus();
 }
 
-function treeWalker(node, focusGroup, initialTarget, options, direction, key) {
-  /**
-   * 1. Walk the tree from here
-   * - If there is a next focusable sibling, return that
-   * - If there is a non-focusable element with children, search for an extended focusgroup
-   * - If there is a shadow dom child, search the shadowroot for an extended focusgroup
-   * - If there is no sibling and current focusgroup is not extended, return null
-   * - If current focusgroup is extended, search for the parent focusgroups next sibling
-   * - If there is no sibling and wrap is enabled, start search again with the first node of the parent focusgroup
-   */
-
+function treeWalker(node, focusGroup, options, direction) {
   /*
-   * 1. Search current node for focusable children
+   * 1. Search current node for focusgroup candidates
    * 2. Search sibling nodes + their children
-   * 3. Search silbings of parent + their children
+   * 3. Search cousin nodes + their children
    */
-  
-  let candidate = findNestedCandidate(node);
 
-  if (!candidate) {
-    
+  debugger;
+
+  // 1. Current node search
+  const childNode =
+    DIRECTION.NEXT === direction ? getFirstChild(node) : getLastChild(node);
+  let candidate = findNestedCandidate(childNode, direction);
+
+  if (candidate) {
+    return candidate;
   }
 
-  while (currentNode) {
-    if (isFocusgroupCandidate() && currentNode.matches(focusableSelector)) {
-      // Found a focusable element belonging to a focusgroup
-      return currentNode;
+  // 2. Sibling node search
+  let sibling =
+    direction === DIRECTION.NEXT
+      ? node.nextElementSibling
+      : node.previousElementSibling;
+  while (sibling) {
+    candidate = findNestedCandidate(sibling, direction);
+    if (candidate) {
+      return candidate;
     }
-
-    // Check if current node has children
-    const childNode =
+    sibling =
       direction === DIRECTION.NEXT
-        ? getFirstChild(currentNode)
-        : getLastChild(currentNode);
-    if (childNode != null) {
-      return treeWalker(
-        childNode,
-        focusGroup,
-        initialTarget,
-        options,
-        direction,
-        key
-      );
-    }
-
-    // Check if currenNode is another focusgroup
-    if (walker.isFocusgroup()) {
-      const currentOptions = getOptions(walker.currentNode);
-      if (currentOptions.extend) {
-        const childNode =
-          direction === DIRECTION.NEXT
-            ? walker.firstChild()
-            : walker.lastChild();
-
-        return treeWalker(
-          childNode,
-          currentNode,
-          initialTarget,
-          currentOptions,
-          direction,
-          key
-        );
-      }
-    }
-
-    // Move prev/next sibling
-    currentNode =
-      direction === DIRECTION.NEXT
-        ? walker.nextSibling()
-        : walker.previousSibling();
+        ? sibling.nextElementSibling
+        : sibling.previousElementSibling;
   }
 
-  // Focusgroup does not contain any more items, start to ascend the tree if it extends
+  // 3. Search cousin nodes and their children
   if (options.extend) {
-    // TODO: walk up shadow dom
-    // See if siblings are focusable
-    currentNode =
-      initialTarget.parentElement || initialTarget.getRootNode().host;
-    while (currentNode) {
-      const nextSibling =
-        direction === DIRECTION.NEXT
-          ? currentNode.nextElementSibling
-          : currentNode.previousElementSibling;
-      if (nextSibling) {
-        const result = treeWalker(
-          nextSibling,
-          null,
-          initialTarget,
-          options,
-          direction,
-          key
-        );
-        if (result) {
-          return result;
-        }
+    const containerNode = getContainerNodeOfNearestParentFocusgroup(focusGroup);
+    let cousinNode =
+      direction === DIRECTION.NEXT
+        ? containerNode.nextElementSibling
+        : containerNode.previousElementSibling;
+    while (cousinNode && !candidate) {
+      candidate = findNestedCandidate(cousinNode);
+      if (candidate) {
+        return candidate;
       }
-      currentNode = currentNode.parentElement || currentNode.getRootNode().host;
+      cousinNode =
+        direction === DIRECTION.NEXT
+          ? containerNode.nextElementSibling
+          : containerNode.previousElementSibling;
     }
   }
 
