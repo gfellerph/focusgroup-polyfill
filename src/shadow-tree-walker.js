@@ -1,14 +1,29 @@
-import { focusableSelector } from "/src/focusable-selectors.js";
+import { focusableSelector } from "./focusable-selectors.js";
+
+/**
+ * Option type for focusgroups
+ * @typedef {object} FocusgroupOptions
+ * @property {boolean} wrap
+ * @property {boolean} horizontal
+ * @property {boolean} vertical
+ * @property {boolean} extend
+ * @property {boolean} grid
+ * @property {boolean} auto
+ */
 
 /**
  * Direction
  * @typedef {object} DIRECTION
  * @property {number} PREVIOUS
  * @property {number} NEXT
+ * @property {number} FIRST
+ * @property {number} LAST
  */
 export const DIRECTION = {
   NEXT: 0,
   PREVIOUS: 1,
+  FIRST: 2,
+  LAST: 3,
 };
 
 /**
@@ -20,12 +35,40 @@ export const isFocusgroup = (element) => {
   return element.hasAttribute("focusgroup");
 };
 
+export const focusgroupDirectionMatches = (optionsA, optionsB) => {
+  if (!optionsA || !optionsB) {
+    return true;
+  }
+
+  return (
+    optionsA.horizontal === optionsB.horizontal ||
+    optionsA.vertical === optionsB.vertical
+  );
+};
+
+/**
+ * Check if arrow key matches focusgroup direction
+ * @param {string} key
+ * @param {FocusgroupOptions} options
+ */
+export const isKeyMatchingDirection = (key, options) => {
+  const vDir = ["ArrowUp", "ArrowDown"];
+  const hDir = ["ArrowLeft", "ArrowRight"];
+
+  return (
+    (options.horizontal && options.vertical) ||
+    (!options.vertical && hDir.includes(key)) ||
+    (!options.horizontal && vDir.includes(key))
+  );
+};
+
 /**
  *
  * @param {Element} element
+ * @param {FocusgroupOptions}
  * @returns {boolean}
  */
-export const isFocusgroupCandidate = (element) => {
+export const isFocusgroupCandidate = (element, options) => {
   const parentNode = getParent(element);
   return parentNode && isFocusgroup(parentNode);
 };
@@ -124,6 +167,26 @@ export const getParentFocusgroup = (element) => {
 };
 
 /**
+ * Figure out in which direction to walk the DOM tree
+ * @param {Element} element
+ * @returns {object} Direction mappings
+ */
+export const getDirectionMap = (element) => {
+  const isLTR = getComputedStyle(element).direction === "ltr";
+
+  return {
+    ArrowLeft: isLTR ? DIRECTION.PREVIOUS : DIRECTION.NEXT,
+    ArrowRight: isLTR ? DIRECTION.NEXT : DIRECTION.PREVIOUS,
+    ArrowUp: DIRECTION.PREVIOUS,
+    ArrowDown: DIRECTION.NEXT,
+    End: DIRECTION.LAST,
+    Home: DIRECTION.FIRST,
+    MetaArrowRight: isLTR ? DIRECTION.LAST : DIRECTION.FIRST,
+    MetaArrowLeft: isLTR ? DIRECTION.FIRST : DIRECTION.LAST,
+  };
+};
+
+/**
  * Gets the parent node that is part of a parent focusgroup
  * @param {Element} element
  * @returns {Element | null}
@@ -182,6 +245,10 @@ export const getOptions = (focusGroup) => {
     options.vertical = true;
     options.horizontal = true;
   }
+  // Only wrapping a child focusgroup does not make sense
+  if (options.extend && options.wrap) {
+    options.wrap = false;
+  }
   return options;
 };
 
@@ -225,14 +292,17 @@ export const getNestedFocusgroups = (startNode) => {
  * @param {number} direction
  * @returns {Element | null}
  */
-export const findNestedCandidate = (element, direction) => {
+export const findNestedCandidate = (element, direction, _options, key) => {
   let currentElement = element;
 
   while (currentElement) {
     // Check if we have a match
+    const options = getOptions(getParent(element));
+    debugger;
     if (
-      isFocusgroupCandidate(currentElement) &&
-      currentElement.matches(focusableSelector)
+      currentElement.matches(focusableSelector) &&
+      isFocusgroupCandidate(currentElement, options) &&
+      isKeyMatchingDirection(key, options)
     ) {
       // TODO: only return if
       // 1. this belongs to the original focusgroup, or
@@ -246,7 +316,7 @@ export const findNestedCandidate = (element, direction) => {
         ? getFirstChild(currentElement)
         : getLastChild(currentElement);
     if (child != null) {
-      return findNestedCandidate(child, direction);
+      return findNestedCandidate(child, direction, null, key);
     }
 
     currentElement =
