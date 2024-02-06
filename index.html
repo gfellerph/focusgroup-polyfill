@@ -6,6 +6,7 @@
     <title>Focusgroup</title>
     <link rel="stylesheet" href="style.css" />
     <script type="module" src="main.js"></script>
+    <script type="module" src="demo.js"></script>
   </head>
   <body>
     <h1>Testing focusgroups</h1>
@@ -22,9 +23,11 @@
     <div focusgroup>
       <button id="regular-focusgroup-button-1">Button 1</button>
       <button id="regular-focusgroup-button-2">Button 2</button>
-      <button>Button 3</button>
+      <a href="#">Link 3</a>
+      I'm just some text
       <button>Button 4</button>
-      <button id="regular-focusgroup-button-5">Button 5</button>
+      <span tabindex="-1">I'm focusable too</span>
+      <button id="regular-focusgroup-button-5">Button 6</button>
     </div>
 
     <h2>RTL focusgroup</h2>
@@ -63,36 +66,50 @@
       <button id="wrong-hv-focusgroup-button-5">Button 5</button>
     </div>
 
+    <h2>Simple nested directional focusgroups</h2>
+    <div focusgroup="horizontal">
+      <button>Horizontal button 1</button>
+      <button>Horizontal button 2</button>
+      <button>Horizontal button 3</button>
+      <div focusgroup="vertical extend" class="vertical">
+        <button>Vertical button 1</button>
+        <button>Vertical button 2</button>
+        <button>Vertical button 3</button>
+      </div>
+      <button>Horizontal button 4</button>
+      <button>Horizontal button 5</button>
+    </div>
+
     <h2 id="vertical-nested">Vertical nested in horizontal</h2>
     <div class="navigation" focusgroup>
       <div focusgroup="extend horizontal">
         <button id="vertical-nested-button-1">Button 1</button>
-        <div class="vertical" focusgroup="extend vertical">
-          <button id="vertical-nested-h-g1-button-1">Nav item 1</button>
-          <button id="vertical-nested-h-g1-button-2">Nav item 2</button>
-          <button>Nav item 3</button>
-          <button>Nav item 4</button>
-          <button>Nav item 5</button>
+        <div class="vertical" focusgroup="vertical">
+          <a href="#" id="vertical-nested-h-g1-button-1">Nav item 1</a>
+          <a href="#" id="vertical-nested-h-g1-button-2">Nav item 2</a>
+          <a href="#">Nav item 3</a>
+          <a href="#">Nav item 4</a>
+          <a href="#">Nav item 5</a>
         </div>
       </div>
       <div focusgroup="extend horizontal">
         <button id="vertical-nested-button-2">Button 2</button>
-        <div class="vertical" focusgroup="extend vertical">
-          <button id="vertical-nested-h-g2-button-1">Nav item 1</button>
-          <button>Nav item 2</button>
-          <button>Nav item 3</button>
-          <button>Nav item 4</button>
-          <button>Nav item 5</button>
+        <div class="vertical" focusgroup="vertical">
+          <a href="#" id="vertical-nested-h-g2-button-1">Nav item 1</a>
+          <a href="#">Nav item 2</a>
+          <a href="#">Nav item 3</a>
+          <a href="#">Nav item 4</a>
+          <a href="#">Nav item 5</a>
         </div>
       </div>
       <div focusgroup="extend horizontal">
         <button>Button 3</button>
-        <div class="vertical" focusgroup="extend vertical">
-          <button>Nav item 1</button>
-          <button>Nav item 2</button>
-          <button>Nav item 3</button>
-          <button>Nav item 4</button>
-          <button>Nav item 5</button>
+        <div class="vertical" focusgroup="vertical">
+          <a href="#">Nav item 1</a>
+          <a href="#">Nav item 2</a>
+          <a href="#">Nav item 3</a>
+          <a href="#">Nav item 4</a>
+          <a href="#">Nav item 5</a>
         </div>
       </div>
     </div>
@@ -120,6 +137,7 @@
     <h2 id="shadow-dom-focusgroup">Shadow Dom focusgroup</h2>
     <div>
       <template shadowrootmode="open">
+        <link rel="stylesheet" href="style.css" />
         <div focusgroup part="shadow">
           <button id="shadow-dom-focusgroup-button-1">Shadow button 1</button>
           <button id="shadow-dom-focusgroup-button-2">Shadow button 2</button>
@@ -133,43 +151,49 @@
     <h2>Nested shadow DOM focusgroup</h2>
     <div>
       <template shadowrootmode="open">
+        <link rel="stylesheet" href="style.css" />
         <div focusgroup part="shadow">
           <button>Shadow button 1</button>
-          <div>
+          <span>
             <template shadowrootmode="open">
-              <div focusgroup="extend" part="shadow">
+              <link rel="stylesheet" href="style.css" />
+              <span focusgroup="extend" part="shadow">
                 <button>Shadow button 2</button>
-                <div>
+                <span>
                   <template shadowrootmode="open">
-                    <div focusgroup="extend" part="shadow">
+                    <link rel="stylesheet" href="style.css" />
+                    <span focusgroup="extend" part="shadow">
                       <button>Shadow button 3</button>
-                      <div>
+                      <span>
                         <template shadowrootmode="open">
-                          <div focusgroup="extend" part="shadow">
+                          <link rel="stylesheet" href="style.css" />
+                          <span focusgroup="extend" part="shadow">
                             <button>Shadow button 4</button>
-                            <div>
+                            <span>
                               <template shadowrootmode="open">
-                                <div focusgroup="extend" part="shadow">
+                                <link rel="stylesheet" href="style.css" />
+                                <span focusgroup="extend" part="shadow">
                                   <button>Shadow button 5</button>
-                                </div>
+                                </span>
                               </template>
-                            </div>
-                          </div>
+                            </span>
+                          </span>
                         </template>
-                      </div>
-                    </div>
+                      </span>
+                    </span>
                   </template>
-                </div>
-              </div>
+                </span>
+              </span>
             </template>
-          </div>
+          </span>
         </div>
       </template>
     </div>
 
     <h2>Light dom focusgroup with shadow dom items</h2>
-    <div focusgroup>
+    <div focusgroup part="shadow">
       <template shadowrootmode="open">
+        <link rel="stylesheet" href="style.css" />
         <button>Shadow button 1</button>
         <button>Shadow button 2</button>
         <button>Shadow button 3</button>
@@ -181,6 +205,7 @@
     <h2>Focusgroup in shadow dom with slotted items</h2>
     <div>
       <template shadowrootmode="open">
+        <link rel="stylesheet" href="style.css" />
         <div part="shadow">
           <slot focusgroup></slot>
         </div>
@@ -199,10 +224,15 @@
       <button>2</button>
       <span>
         <template shadowrootmode="open">
+          <link rel="stylesheet" href="style.css" />
           <span focusgroup="extend" part="shadow">
             <button>3</button>
             <button>4</button>
-            <slot focusgroup="extend"></slot>
+            <span part="slot">
+              <slot focusgroup="extend"></slot>
+            </span>
+            <button>7</button>
+            <button>8</button>
           </span>
         </template>
         <button>5</button>
@@ -233,6 +263,7 @@
       <button>Button 3</button>
       <div>
         <template shadowrootmode="open">
+          <link rel="stylesheet" href="style.css" />
           <div focusgroup="extend" part="shadow">
             <button>Nested Button 1</button>
             <button>Nested Button 2</button>
@@ -298,12 +329,49 @@
       </button>
     </div>
 
-    <ul>
-      <li>when going back, the top level buttons are skipped</li>
-      <li>
-        when reaching the end, a maximum call stack size exceeded error appears
-      </li>
-    </ul>
+    <h2>Focus interference with JS</h2>
+    <button
+      id="js-interference-trigger"
+      onclick="document.getElementById('js-interference-button-2').focus()"
+    >
+      Set focus to Button 2
+    </button>
+    <div focusgroup>
+      <button>Button 1</button>
+      <button id="js-interference-button-2">Button 2</button>
+      <button>Button 3</button>
+      <button>Button 4</button>
+      <button>Button 5</button>
+    </div>
+
+    <h2>Simple dom interference</h2>
+    <button id="dom-interference-add-button">Add button to focusgroup</button>
+    <button id="dom-interference-remove-button">
+      Remove button from focusgroup
+    </button>
+    <div focusgroup id="dom-interference-container">
+      <button>Button 1</button>
+      <button>Button 2</button>
+      <button>Button 3</button>
+    </div>
+
+    <h2>Just in time options</h2>
+    <fieldset>
+      <legend>Focusgroup options</legend>
+      <input type="checkbox" name="vertical" id="jit-vertical" />
+      <label for="jit-vertical">Vertical</label>
+      <input type="checkbox" name="horizontal" id="jit-horizontal" />
+      <label for="jit-horizontal">Horizontal</label>
+      <input type="checkbox" name="wrap" id="jit-wrap" />
+      <label for="jit-wrap">Wrap</label>
+    </fieldset>
+    <div focusgroup id="jit-focusgroup">
+      <button>Button 1</button>
+      <button>Button 2</button>
+      <button>Button 3</button>
+      <button>Button 4</button>
+      <button>Button 5</button>
+    </div>
 
     <h2>Different focusable elements</h2>
     <div focusgroup>
@@ -364,6 +432,7 @@
     <h2>Not focusgroups</h2>
     <div>
       <template shadowrootmode="open">
+        <link rel="stylesheet" href="style.css" />
         <div part="shadow">
           <slot></slot>
         </div>
