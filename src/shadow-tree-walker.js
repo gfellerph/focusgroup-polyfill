@@ -298,7 +298,7 @@ export const findNestedCandidate = (element, direction, _options, key) => {
   while (currentElement) {
     // Check if we have a match
     const options = getOptions(getParent(element));
-    debugger;
+    // debugger;
     if (
       currentElement.matches(focusableSelector) &&
       isFocusgroupCandidate(currentElement, options) &&
@@ -326,4 +326,39 @@ export const findNestedCandidate = (element, direction, _options, key) => {
   }
 
   return currentElement;
+};
+
+export const findCousinCandidate = (element, direction, key) => {
+  if (!element) {
+    return null;
+  }
+
+  // 1. find container inside parent focusgroup
+  // 2. go to next/prev sibling
+  // 3. find nested candidate
+  // 4. if candidate, return
+  // 5. if no candidate and extend, find next parent focusgroup
+
+  const container = getContainerNodeOfNearestParentFocusgroup(element);
+  let currentElement =
+    direction === DIRECTION.NEXT
+      ? container.nextElementSibling
+      : container.previousElementSibling;
+  while (currentElement) {
+    const candidate = findNestedCandidate(currentElement, direction, null, key);
+    if (candidate) {
+      return candidate;
+    }
+    currentElement =
+      direction === DIRECTION.NEXT
+        ? currentElement.nextElementSibling
+        : currentElement.previousElementSibling;
+  }
+
+  const parent = getParent(element);
+  if (getOptions(parent).extend) {
+    return findCousinCandidate(parent, direction, key);
+  }
+
+  return null;
 };

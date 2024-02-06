@@ -10,7 +10,7 @@
   background-color: white;
 }
 
-.vertical {
+[focusgroup~="vertical"] {
   display: flex;
   flex-direction: column;
   align-items: flex-start;

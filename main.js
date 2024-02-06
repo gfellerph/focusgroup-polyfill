@@ -3,18 +3,15 @@ import {
   keyConflictSelector,
 } from "/src/focusable-selectors.js";
 import {
-  getFirstChild,
   getChildren,
   getOptions,
   getAncestorFocusgroup,
   getNestedFocusgroups,
-  getLastChild,
-  isKeyMatchingDirection,
   DIRECTION,
   getDirectionMap,
   getParent,
   findNestedCandidate,
-  getContainerNodeOfNearestParentFocusgroup,
+  findCousinCandidate,
 } from "/src/shadow-tree-walker.js";
 
 const observedRoots = new WeakMap();
@@ -194,7 +191,6 @@ function treeWalker(node, focusGroup, options, direction, key) {
   }
 
   // 2. Sibling node search
-  // Only applies if the focusgroup goes into the right direction
   let sibling =
     direction === DIRECTION.NEXT
       ? node.nextElementSibling
@@ -213,25 +209,11 @@ function treeWalker(node, focusGroup, options, direction, key) {
   // 3. Search other descendants of the ancestor focusgroup
   // TODO: loop over all possible parents, not just the first
   if (options.extend) {
-    const containerNode = getContainerNodeOfNearestParentFocusgroup(focusGroup);
-    let cousinNode =
-      direction === DIRECTION.NEXT
-        ? containerNode.nextElementSibling
-        : containerNode.previousElementSibling;
-    while (cousinNode && !candidate) {
-      candidate = findNestedCandidate(cousinNode, direction, options, key);
-      if (candidate) {
-        return candidate;
-      }
-      cousinNode =
-        direction === DIRECTION.NEXT
-          ? containerNode.nextElementSibling
-          : containerNode.previousElementSibling;
-    }
+    candidate = findCousinCandidate(node, direction, key);
   }
 
   // Found nothing
-  return null;
+  return candidate;
 }
 
 function setTabindices(target, focusgroup) {

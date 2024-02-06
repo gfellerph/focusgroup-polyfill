@@ -26,9 +26,14 @@
       <a href="#">Link 3</a>
       I'm just some text
       <button>Button 4</button>
+      <button disabled="disabled" tabindex="0">not today</button>
       <span tabindex="-1">I'm focusable too</span>
       <button id="regular-focusgroup-button-5">Button 6</button>
     </div>
+
+    <ul>
+      <li>TODO: a disabled button with tabindex is a focus trap</li>
+    </ul>
 
     <h2>RTL focusgroup</h2>
     <div dir="rtl" focusgroup>
@@ -66,18 +71,67 @@
       <button id="wrong-hv-focusgroup-button-5">Button 5</button>
     </div>
 
-    <h2>Simple nested directional focusgroups</h2>
+    <h2>Simple horizontal with extending vertical focusgroups</h2>
     <div focusgroup="horizontal">
-      <button>Horizontal button 1</button>
-      <button>Horizontal button 2</button>
-      <button>Horizontal button 3</button>
+      <button id="horizontal-extending-vertical-button-1">
+        Horizontal button 1
+      </button>
+      <button id="horizontal-extending-vertical-button-2">
+        Horizontal button 2
+      </button>
+      <button id="horizontal-extending-vertical-button-3">
+        Horizontal button 3
+      </button>
       <div focusgroup="vertical extend" class="vertical">
-        <button>Vertical button 1</button>
-        <button>Vertical button 2</button>
-        <button>Vertical button 3</button>
+        <button id="horizontal-extending-vertical-button-3-1">
+          Vertical button 3.1
+        </button>
+        <button id="horizontal-extending-vertical-button-3-2">
+          Vertical button 3.2
+        </button>
+        <button id="horizontal-extending-vertical-button-3-3">
+          Vertical button 3.3
+        </button>
       </div>
-      <button>Horizontal button 4</button>
-      <button>Horizontal button 5</button>
+      <button id="horizontal-extending-vertical-button-4">
+        Horizontal button 4
+      </button>
+      <button id="horizontal-extending-vertical-button-5">
+        Horizontal button 5
+      </button>
+    </div>
+
+    <h2>Simple vertical with extending horizontal focusgroup</h2>
+    <div focusgroup="vertical">
+      <button>Vertical button 1</button>
+      <button>Vertical button 2</button>
+      <button>Vertical button 3</button>
+      <div focusgroup="horizontal extend">
+        <button>Horizontal button 3.1</button>
+        <button>Horizontal button 3.2</button>
+        <button>Horizontal button 3.3</button>
+      </div>
+      <button>Vertical button 4</button>
+      <button>Vertical button 5</button>
+    </div>
+
+    <h2>Simple all extending focusgroups</h2>
+    <div focusgroup>
+      <div focusgroup="vertical extend">
+        <button>Extending button 1</button>
+      </div>
+      <div focusgroup="vertical extend">
+        <button>Extending button 2</button>
+      </div>
+      <div focusgroup="vertical extend">
+        <button>Extending button 3</button>
+      </div>
+      <div focusgroup="vertical extend">
+        <button>Extending button 4</button>
+      </div>
+      <div focusgroup="vertical extend">
+        <button>Extending button 5</button>
+      </div>
     </div>
 
     <h2 id="vertical-nested">Vertical nested in horizontal</h2>
@@ -113,17 +167,6 @@
         </div>
       </div>
     </div>
-    <ul>
-      <li>
-        Current implementation does not search for same direction next/prev
-        elements, therefore this use case is broken
-      </li>
-      <li>
-        horizontal direction on the top level is contradicting because a down
-        arrow press should go to the sub-menu but with the horizontal option,
-        down arrow is not active
-      </li>
-    </ul>
 
     <h2 id="wrapping-focusgroup">Wrapping focusgroup</h2>
     <div focusgroup="wrap">
@@ -220,23 +263,23 @@
     <h2>Mixed light dom, shadow dom and slotted</h2>
     <p>Complicated use-case</p>
     <div focusgroup>
-      <button>1</button>
-      <button>2</button>
+      <button id="mixed-dom-button-1">1</button>
+      <button id="mixed-dom-button-2">2</button>
       <span>
         <template shadowrootmode="open">
           <link rel="stylesheet" href="style.css" />
           <span focusgroup="extend" part="shadow">
-            <button>3</button>
-            <button>4</button>
+            <button id="mixed-dom-button-3">3</button>
+            <button id="mixed-dom-button-4">4</button>
             <span part="slot">
               <slot focusgroup="extend"></slot>
             </span>
-            <button>7</button>
-            <button>8</button>
+            <button id="mixed-dom-button-7">7</button>
+            <button id="mixed-dom-button-8">8</button>
           </span>
         </template>
-        <button>5</button>
-        <button>6</button>
+        <button id="mixed-dom-button-5">5</button>
+        <button id="mixed-dom-button-6">6</button>
       </span>
     </div>
 

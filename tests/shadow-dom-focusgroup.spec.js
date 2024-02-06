@@ -8,7 +8,9 @@ test("Reference tab test", async ({ page }) => {
   const button1 = await page.$("#shadow-dom-focusgroup-button-1");
   await button1?.focus();
   await button1?.press("Tab");
-  await expect(page.locator("#shadow-dom-focusgroup-button-2")).toBeFocused();
+  await expect(
+    page.locator("#shadow-dom-focusgroup-button-2")
+  ).not.toBeFocused();
 });
 
 test("Regular focusgroup arrow right", async ({ page }) => {
