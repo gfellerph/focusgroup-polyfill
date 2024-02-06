@@ -1,6 +1,13 @@
 *::part(shadow) {
+  display: inline-block;
   padding: 0.5rem;
   background-color: rgba(0, 0, 0, 0.22);
+}
+
+*::part(slot) {
+  display: inline-block;
+  padding: 0.5rem;
+  background-color: white;
 }
 
 .vertical {
@@ -12,4 +19,12 @@
 .navigation {
   display: flex;
   gap: 1rem;
+}
+
+#dom-interference-container:not(:has(button))::before {
+  content: "Click the buttons above to add more buttons.";
+}
+
+fieldset {
+  margin-block: 1em;
 }
