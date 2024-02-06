@@ -1,19 +1,28 @@
 {
   "name": "focusgroup",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.0.1-experimental.0",
+  "description": "Partial polyfill for the focusgroup attribute (https://open-ui.org/components/focusgroup.explainer/).",
+  "keywords": [
+    "focusgroup",
+    "polyfill"
+  ],
+  "author": "Philipp Gfeller <philipp.gfeller@post.ch>",
+  "license": "Apache-2.0",
+  "main": "dist/main.js",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "esbuild main.js --bundle --minify --outfile='dist/main.js'",
     "serve": "http-server",
     "test": "playwright test",
     "testui": "playwright test --ui"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.40.1",
     "@types/node": "^20.10.4",
+    "esbuild": "^0.20.0",
     "http-server": "^14.1.1"
   }
 }

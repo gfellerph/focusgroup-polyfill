@@ -1,5 +1,5 @@
 // @ts-check
-const { test, expect } = require("@playwright/test");
+import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
@@ -43,5 +43,15 @@ test("Regular focusgroup does not wrap right", async ({ page }) => {
 
 test("Regular focusgroup does not wrap left", async ({ page }) => {
   await page.locator("#regular-focusgroup-button-1").press("ArrowLeft");
+  await expect(page.locator("#regular-focusgroup-button-1")).toBeFocused();
+});
+
+test("Regular focusgroup end keypress", async ({ page }) => {
+  await page.locator("#regular-focusgroup-button-1").press("End");
+  await expect(page.locator("#regular-focusgroup-button-5")).toBeFocused();
+});
+
+test("Regular focusgroup home keypress", async ({ page }) => {
+  await page.locator("#regular-focusgroup-button-5").press("Home");
   await expect(page.locator("#regular-focusgroup-button-1")).toBeFocused();
 });
