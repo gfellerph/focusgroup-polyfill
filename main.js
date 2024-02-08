@@ -1,7 +1,4 @@
-import {
-  focusableSelector,
-  keyConflictSelector,
-} from "/src/focusable-selectors.js";
+import { focusableSelector, keyConflictSelector } from './src/focusable-selectors.js';
 import {
   getChildren,
   getOptions,
@@ -12,7 +9,7 @@ import {
   getParent,
   findNestedCandidate,
   findCousinCandidate,
-} from "/src/shadow-tree-walker.js";
+} from './src/shadow-tree-walker.js';
 
 const observedRoots = new WeakMap();
 const initializedFocusgroups = new WeakMap();
@@ -25,12 +22,12 @@ const initializedFocusgroups = new WeakMap();
 export default function registerFocusinListener(root) {
   if (!observedRoots.has(root)) {
     observedRoots.set(root, true);
-    root.addEventListener("focusin", focusInHandler);
+    root.addEventListener('focusin', focusInHandler);
   }
 }
 
 registerFocusinListener(window);
-console.log("registered");
+console.log('registered');
 
 // Register the top level focus in event listener, starting the whole process
 // registerFocusinListener(window);
@@ -47,8 +44,8 @@ function focusInHandler(focusEvent) {
     // Stop bubbling to upper focusgroups to prevent double handling of the event
     focusEvent.stopPropagation();
     setTabindices(activeElement, focusGroup, getOptions(focusGroup));
-    activeElement.addEventListener("keydown", (event) =>
-      handleKeydown(event, activeElement, focusGroup)
+    activeElement.addEventListener('keydown', event =>
+      handleKeydown(event, activeElement, focusGroup),
     );
   }
 }
@@ -64,7 +61,7 @@ function handleKeydown(event, focusTarget, focusGroup) {
   // If default is prevented, disable focusgroup behavior
   if (event.defaultPrevented) return;
 
-  const key = `${event.getModifierState("Meta") ? "Meta" : ""}${event.key}`;
+  const key = `${event.getModifierState('Meta') ? 'Meta' : ''}${event.key}`;
   const options = getOptions(focusGroup);
   const keyMap = getDirectionMap(focusTarget);
 
@@ -108,37 +105,18 @@ function getActiveElement(event) {
 function getFocusGroup(element) {
   const parentNode = getParent(element);
 
-  if (parentNode?.hasAttribute("focusgroup")) {
+  if (parentNode?.hasAttribute('focusgroup')) {
     return parentNode;
   } else {
     return null;
   }
 }
 
-function focusNode(
-  activeElement,
-  activeFocusGroup,
-  options,
-  key,
-  direction,
-  event
-) {
-  let nodeToFocus = treeWalker(
-    activeElement,
-    activeFocusGroup,
-    options,
-    direction,
-    key
-  );
+function focusNode(activeElement, activeFocusGroup, options, key, direction, event) {
+  let nodeToFocus = treeWalker(activeElement, activeFocusGroup, options, direction, key);
 
   if (nodeToFocus == null && options.wrap) {
-    nodeToFocus = treeWalker(
-      activeFocusGroup,
-      activeFocusGroup,
-      options,
-      direction,
-      key
-    );
+    nodeToFocus = treeWalker(activeFocusGroup, activeFocusGroup, options, direction, key);
   }
 
   if (nodeToFocus != null) {
@@ -151,9 +129,9 @@ function focusNode(
 function setFocus(target, previousTarget, focusGroup) {
   // Refresh last target for focusgroup
   initializedFocusgroups.set(focusGroup, target);
-  previousTarget.setAttribute("tabindex", "-1");
-  target.setAttribute("tabindex", "0");
-  previousTarget.removeEventListener("keydown", handleKeydown);
+  previousTarget.setAttribute('tabindex', '-1');
+  target.setAttribute('tabindex', '0');
+  previousTarget.removeEventListener('keydown', handleKeydown);
   target.focus();
 }
 
@@ -179,10 +157,7 @@ function treeWalker(node, focusGroup, options, direction, key) {
   // This is an edge case
   const children = getChildren(node);
   if (children?.length > 0) {
-    const childNode =
-      DIRECTION.NEXT === direction
-        ? children[0]
-        : children[children.length - 1];
+    const childNode = DIRECTION.NEXT === direction ? children[0] : children[children.length - 1];
     candidate = findNestedCandidate(childNode, direction);
   }
 
@@ -192,18 +167,14 @@ function treeWalker(node, focusGroup, options, direction, key) {
 
   // 2. Sibling node search
   let sibling =
-    direction === DIRECTION.NEXT
-      ? node.nextElementSibling
-      : node.previousElementSibling;
+    direction === DIRECTION.NEXT ? node.nextElementSibling : node.previousElementSibling;
   while (sibling) {
     candidate = findNestedCandidate(sibling, direction, options, key);
     if (candidate) {
       return candidate;
     }
     sibling =
-      direction === DIRECTION.NEXT
-        ? sibling.nextElementSibling
-        : sibling.previousElementSibling;
+      direction === DIRECTION.NEXT ? sibling.nextElementSibling : sibling.previousElementSibling;
   }
 
   // 3. Search other descendants of the ancestor focusgroup
@@ -227,15 +198,15 @@ function setTabindices(target, focusgroup) {
   disableFocusOnChildren(ancestorFocusgroup, target);
 
   // Search for extended focusgroups and set tab indices on them as well (every child)
-  getNestedFocusgroups(ancestorFocusgroup).forEach((group) => {
+  getNestedFocusgroups(ancestorFocusgroup).forEach(group => {
     disableFocusOnChildren(group);
   });
 }
 
 function disableFocusOnChildren(element, targetElement = null) {
-  Array.from(getChildren(element)).forEach((child) => {
+  Array.from(getChildren(element)).forEach(child => {
     if (child !== targetElement && child.matches(focusableSelector)) {
-      child.setAttribute("tabindex", "-1");
+      child.setAttribute('tabindex', '-1');
     }
   });
 }
