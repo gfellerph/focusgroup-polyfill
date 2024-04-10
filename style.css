@@ -10,6 +10,21 @@
   background-color: white;
 }
 
+[focusgroup]:has(:focus-visible) {
+  position: relative;
+  outline: 2px solid grey;
+
+  &:before {
+    content: "<- Arrow keys enabled ->";
+    position: absolute;
+    top: 100%;
+    color: white;
+    background-color: grey;
+    padding: 0.125em 0.25em;
+    font-size: 0.8em;
+  }
+}
+
 [focusgroup~="vertical"] {
   display: flex;
   flex-direction: column;

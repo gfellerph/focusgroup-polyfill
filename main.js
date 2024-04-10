@@ -1,72 +1,30 @@
-import { focusableSelector, keyConflictSelector } from './src/focusable-selectors.js';
 import {
   getChildren,
   getOptions,
-  getAncestorFocusgroup,
-  getNestedFocusgroups,
-  DIRECTION,
   getDirectionMap,
-  getParent,
-  findNestedCandidate,
-  findCousinCandidate,
-} from './src/shadow-tree-walker.js';
+  isFocusgroupCandidate,
+  candidateReasons,
+  rovingFocusgroups,
+  disableRovingTabindex,
+  initializeRovingTabindex,
+  setRovingTabindex,
+  resetRovingTabindex,
+  findNextCandidate,
+  DIRECTION,
+} from "./src/shadow-tree-walker.js";
 
+// A map for keeping track of observed root nodes
 const observedRoots = new WeakMap();
-const initializedFocusgroups = new WeakMap();
 
 /**
- * Add a focusin listener to a root element to enable
- * more precise focus target identification
+ * Add a focusin listener to a root element to enable focusgroup behaviour on that element and
+ * its decendants
  * @param {Element} root
  */
 export default function registerFocusinListener(root) {
   if (!observedRoots.has(root)) {
     observedRoots.set(root, true);
-    root.addEventListener('focusin', focusInHandler);
-  }
-}
-
-registerFocusinListener(window);
-console.log('registered');
-
-// Register the top level focus in event listener, starting the whole process
-// registerFocusinListener(window);
-
-function focusInHandler(focusEvent) {
-  // Find the real focused element, even if it's nested in a shadow-root
-  const activeElement = getActiveElement(focusEvent);
-
-  // Check if target is part of a focusgroup
-  const focusGroup = getFocusGroup(activeElement);
-
-  // If it is, start to handle keydown events
-  if (focusGroup != null && !activeElement.matches(keyConflictSelector)) {
-    // Stop bubbling to upper focusgroups to prevent double handling of the event
-    focusEvent.stopPropagation();
-    setTabindices(activeElement, focusGroup, getOptions(focusGroup));
-    activeElement.addEventListener('keydown', event =>
-      handleKeydown(event, activeElement, focusGroup),
-    );
-  }
-}
-
-/**
- *
- * @param {KeyboardEvent} event
- * @param {Element} focusTarget
- * @param {Element} focusGroup
- * @returns
- */
-function handleKeydown(event, focusTarget, focusGroup) {
-  // If default is prevented, disable focusgroup behavior
-  if (event.defaultPrevented) return;
-
-  const key = `${event.getModifierState('Meta') ? 'Meta' : ''}${event.key}`;
-  const options = getOptions(focusGroup);
-  const keyMap = getDirectionMap(focusTarget);
-
-  if (key in keyMap) {
-    focusNode(focusTarget, focusGroup, options, key, keyMap[key], event);
+    root.addEventListener("focusin", focusInHandler);
   }
 }
 
@@ -75,7 +33,7 @@ function handleKeydown(event, focusTarget, focusGroup) {
  * @param {Event} event
  * @returns {Element}
  */
-function getActiveElement(event) {
+export const getActiveElement = (event) => {
   let root = event.target.shadowRoot;
   let keepGoing = root != null;
   if (keepGoing) {
@@ -89,124 +47,125 @@ function getActiveElement(event) {
       }
     }
 
+    // Continuous focusin events are not fired from the same shadow root, a dedicated listener has to be set for each root
     registerFocusinListener(root);
+
     return root.activeElement;
   } else {
-    // It's the light dom, the target is the actual focusable element
+    // It's the light dom, the target is the actually focused element
     return event.target;
+  }
+};
+
+/**
+ * Focus in event handler
+ * @param {FocusEvent} focusEvent
+ */
+function focusInHandler(focusEvent) {
+  // Find the real focused element, even if it's nested in a shadow-root
+  const activeElement = getActiveElement(focusEvent);
+
+  // Check if target is a candidate
+  const { isCandidate, reason, focusgroup } =
+    isFocusgroupCandidate(activeElement);
+
+  // If it is, start to handle keydown events
+  if (isCandidate) {
+    focusEvent.stopPropagation();
+    initializeRovingTabindex(focusgroup);
+
+    activeElement.addEventListener("keydown", (event) =>
+      handleKeydown(event, activeElement, focusgroup)
+    );
+  } else if (
+    reason === candidateReasons.KEY_CONFLICT &&
+    rovingFocusgroups.has(focusgroup)
+  ) {
+    // Focus is on a key conflict field, disable roving behavior
+    disableRovingTabindex(focusgroup);
   }
 }
 
 /**
- * Find the focusgroup element, across shadow roots
- * @param {Element} element
- * @returns {Element|null} The focusgroup element or null if the input element is not part of a focusgroup
+ * Keydown event handler
+ * @param {KeyboardEvent} event
+ * @param {Element} focusTarget
+ * @param {Element} focusGroup
+ * @returns
  */
-function getFocusGroup(element) {
-  const parentNode = getParent(element);
+function handleKeydown(event, focusTarget, focusGroup) {
+  // If default is prevented, disable focusgroup behavior
+  if (event.defaultPrevented) return;
 
-  if (parentNode?.hasAttribute('focusgroup')) {
-    return parentNode;
-  } else {
-    return null;
+  const key = `${event.getModifierState("Meta") ? "Meta" : ""}${event.key}`;
+  const options = getOptions(focusGroup);
+  const keyMap = getDirectionMap(focusTarget);
+
+  if (key in keyMap) {
+    focusNode(
+      focusTarget,
+      focusGroup,
+      options,
+      key,
+      keyMap[key] === DIRECTION.NEXT,
+      event
+    );
   }
 }
 
-function focusNode(activeElement, activeFocusGroup, options, key, direction, event) {
-  let nodeToFocus = treeWalker(activeElement, activeFocusGroup, options, direction, key);
+/**
+ * Figure out which node to focus next
+ * @param {Element} activeElement The currently focused element
+ * @param {Element} activeFocusGroup The parent focusgroup of the selected element
+ * @param {import("./src/shadow-tree-walker.js").FocusgroupOptions} options
+ * @param {string} key Key that triggered the event, prefixed with Meta if meta key is pressed
+ * @param {boolean} forward Whether the direction is forward or not
+ * @param {KeyboardEvent} event The event that fired
+ */
+function focusNode(
+  activeElement,
+  activeFocusGroup,
+  options,
+  key,
+  forward,
+  event
+) {
+  // TODO: Check if key goes in the right direction
 
+  let nodeToFocus = findNextCandidate(activeElement, forward);
+
+  // Handle wrapping behaviour
   if (nodeToFocus == null && options.wrap) {
-    nodeToFocus = treeWalker(activeFocusGroup, activeFocusGroup, options, direction, key);
+    const children = getChildren(activeFocusGroup);
+    const startingNode = forward ? children[0] : children[children.length - 1];
+    nodeToFocus = findNextCandidate(startingNode, forward, true, false, 1);
   }
 
-  if (nodeToFocus != null) {
+  // TODO: Check if nodeToFocus is in viewport
+
+  if (nodeToFocus) {
     // Key event is handled by the focusgroup, prevent other default events
     event.preventDefault();
+    activeElement.removeEventListener("keydown", handleKeydown);
     setFocus(nodeToFocus, activeElement, activeFocusGroup);
   }
 }
 
-function setFocus(target, previousTarget, focusGroup) {
+/**
+ * Sets the focus to a new target, handling the roving tabindex for the last one
+ * @param {Element} target
+ * @param {Element} previousTarget
+ */
+function setFocus(target, previousTarget) {
   // Refresh last target for focusgroup
-  initializedFocusgroups.set(focusGroup, target);
-  previousTarget.setAttribute('tabindex', '-1');
-  target.setAttribute('tabindex', '0');
-  previousTarget.removeEventListener('keydown', handleKeydown);
+  setRovingTabindex(previousTarget);
+  resetRovingTabindex(target);
   target.focus();
 }
 
-/**
- *
- * @param {Element} node
- * @param {Element} focusGroup
- * @param {FocusgroupOptions} options
- * @param {DIRECTION} direction
- * @param {string} key
- * @returns
- */
-function treeWalker(node, focusGroup, options, direction, key) {
-  /*
-   * 1. Search current node for focusgroup candidates
-   * 2. Search sibling nodes + their children
-   * 3. Search cousin nodes + their children
-   */
-
-  let candidate = null;
-
-  // 1. Child node search
-  // This is an edge case
-  const children = getChildren(node);
-  if (children?.length > 0) {
-    const childNode = DIRECTION.NEXT === direction ? children[0] : children[children.length - 1];
-    candidate = findNestedCandidate(childNode, direction);
-  }
-
-  if (candidate) {
-    return candidate;
-  }
-
-  // 2. Sibling node search
-  let sibling =
-    direction === DIRECTION.NEXT ? node.nextElementSibling : node.previousElementSibling;
-  while (sibling) {
-    candidate = findNestedCandidate(sibling, direction, options, key);
-    if (candidate) {
-      return candidate;
-    }
-    sibling =
-      direction === DIRECTION.NEXT ? sibling.nextElementSibling : sibling.previousElementSibling;
-  }
-
-  // 3. Search other descendants of the ancestor focusgroup
-  // TODO: loop over all possible parents, not just the first
-  if (options.extend) {
-    candidate = findCousinCandidate(node, direction, key);
-  }
-
-  // Found nothing
-  return candidate;
-}
-
-function setTabindices(target, focusgroup) {
-  if (initializedFocusgroups.has(focusgroup)) {
-    // Focusgroup was alerady initialized
-    return;
-  }
-  const ancestorFocusgroup = getAncestorFocusgroup(focusgroup);
-  initializedFocusgroups.set(ancestorFocusgroup, target);
-
-  disableFocusOnChildren(ancestorFocusgroup, target);
-
-  // Search for extended focusgroups and set tab indices on them as well (every child)
-  getNestedFocusgroups(ancestorFocusgroup).forEach(group => {
-    disableFocusOnChildren(group);
-  });
-}
-
-function disableFocusOnChildren(element, targetElement = null) {
-  Array.from(getChildren(element)).forEach(child => {
-    if (child !== targetElement && child.matches(focusableSelector)) {
-      child.setAttribute('tabindex', '-1');
-    }
-  });
+// Start polyfill
+// TODO: check if the browser supports focusgroup
+// TODO: let users define the scope where they want focusgroup to be active
+if (window) {
+  registerFocusinListener(window);
 }

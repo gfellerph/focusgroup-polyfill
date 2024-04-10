@@ -1,4 +1,8 @@
-import { focusableSelector } from "./focusable-selectors.js";
+import {
+  focusDisablingParentSelecor,
+  focusableSelector,
+  keyConflictSelector,
+} from "./focusable-selectors.js";
 
 /**
  * Option type for focusgroups
@@ -27,50 +31,199 @@ export const DIRECTION = {
 };
 
 /**
- *
+ * Check if the element is a focusgroup
  * @param {Element} element
  * @returns {boolean}
  */
-export const isFocusgroup = (element) => {
+const isFocusgroup = (element) => {
   return element.hasAttribute("focusgroup");
 };
 
-export const focusgroupDirectionMatches = (optionsA, optionsB) => {
-  if (!optionsA || !optionsB) {
-    return true;
-  }
-
-  return (
-    optionsA.horizontal === optionsB.horizontal ||
-    optionsA.vertical === optionsB.vertical
-  );
-};
-
 /**
- * Check if arrow key matches focusgroup direction
- * @param {string} key
- * @param {FocusgroupOptions} options
+ * @typedef {object} CANDIDATE_REASON
+ * @property {number} NO_FOCUSGROUP
+ * @property {number} NOT_FOCUSABLE
+ * @property {number} KEY_CONFLICT
+ * @property {number} FOCUSGROUP_NONE
+ * @property {number} IS_CANDIDATE
  */
-export const isKeyMatchingDirection = (key, options) => {
-  const vDir = ["ArrowUp", "ArrowDown"];
-  const hDir = ["ArrowLeft", "ArrowRight"];
-
-  return (
-    (options.horizontal && options.vertical) ||
-    (!options.vertical && hDir.includes(key)) ||
-    (!options.horizontal && vDir.includes(key))
-  );
+export const candidateReasons = {
+  NO_FOCUSGROUP: 1,
+  NOT_FOCUSABLE: 2,
+  KEY_CONFLICT: 3,
+  FOCUSGROUP_NONE: 4,
+  IS_CANDIDATE: 5,
 };
 
 /**
- *
+ * Candidate check result
+ * @typedef {object} CANDIDATE_CHECK_RESULT
+ * @property {CANDIDATE_REASON} reason
+ * @property {boolean} isCandidate
+ * @property {Element | null} focusgroup
+ */
+
+/**
+ * Checks if an element is a candidate for a focusgroup and returns
+ * the result of the check and also the reason that lead to the result
  * @param {Element} element
- * @param {FocusgroupOptions}
+ * @returns {CANDIDATE_CHECK_RESULT}
+ */
+export const isFocusgroupCandidate = (element) => {
+  const focusgroup = getParentFocusgroup(element);
+
+  // Check if element is part of a focusgroup
+  if (!focusgroup)
+    return {
+      isCandidate: false,
+      reason: candidateReasons.NO_FOCUSGROUP,
+      focusgroup,
+    };
+
+  // Check if the focusgroup options is not none
+  if (focusgroup.getAttribute("focusgroup") === "none")
+    return {
+      isCandidate: false,
+      reason: candidateReasons.FOCUSGROUP_NONE,
+      focusgroup,
+    };
+
+  // Check if the element is focusable
+  if (!isFocusable(element))
+    return {
+      isCandidate: false,
+      reason: candidateReasons.NOT_FOCUSABLE,
+      focusgroup,
+    };
+
+  // Check if the element has no key conflict
+  if (element.matches(keyConflictSelector))
+    return {
+      isCandidate: false,
+      reason: candidateReasons.KEY_CONFLICT,
+      focusgroup,
+    };
+
+  // All checks passed, this is a candidate
+  return {
+    isCandidate: true,
+    reason: candidateReasons.IS_CANDIDATE,
+    focusgroup,
+  };
+};
+
+/**
+ * Check if an element is currently focusable
+ * @param {Element} element
  * @returns {boolean}
  */
-export const isFocusgroupCandidate = (element, options) => {
-  const parentNode = getParent(element);
-  return parentNode && isFocusgroup(parentNode);
+const isFocusable = (element) => {
+  return (
+    !element.matches(focusDisablingParentSelecor) &&
+    element.matches(focusableSelector)
+  );
+};
+
+// Holds a list of initialized roving tabindex focusgroups
+export const rovingFocusgroups = new WeakMap();
+
+/**
+ * Initializes roving behavior. Only call this if you know
+ * that one of the elements has focus.
+ * @param {Element} element
+ * @returns
+ */
+export const initializeRovingTabindex = (element) => {
+  if (rovingFocusgroups.has(element)) return;
+
+  const candidates = findCandidates(element);
+  const focusedCandidate = candidates.filter((candidate) =>
+    candidate.matches(":focus")
+  );
+  if (!focusedCandidate) return;
+  candidates.map((candidate) => {
+    if (candidate.matches(":focus")) {
+      // This element should be focusable by tabstop
+      resetRovingTabindex(candidate);
+    } else {
+      setRovingTabindex(candidate);
+    }
+  });
+  rovingFocusgroups.set(element, true);
+};
+
+/**
+ * Uses tabindex to create a roving tabindex behavior. If the
+ * element previously had a tabindex set, it will be memorized
+ * in a custom attribute and restored if focusgroup functionality
+ * is being reset.
+ * @param {Element} element
+ */
+export const setRovingTabindex = (element) => {
+  const currentTabindex = element.getAttribute("tabindex");
+  element.setAttribute("tabindex", "-1");
+  if (currentTabindex) {
+    element.setAttribute("data-focusgroup-tabindex-memory", currentTabindex);
+  }
+};
+
+/**
+ * Reset the roving tabindex behaviour. If the element previously
+ * had a tabindex set, it's restored to its previous value.
+ * @param {Element} element
+ */
+export const resetRovingTabindex = (element) => {
+  const tabindexMemory = element.getAttribute(
+    "data-focusgroup-tabindex-memory"
+  );
+  if (tabindexMemory) {
+    element.setAttribute("tabindex", tabindexMemory);
+  } else {
+    element.removeAttribute("tabindex");
+  }
+};
+
+/**
+ * Removes roving tabindex behavior from a focusgroup
+ * @param {Element} element
+ */
+export const disableRovingTabindex = (element) => {
+  if (rovingFocusgroups.has(element)) {
+    rovingFocusgroups.delete(element);
+  }
+  getCandidates(element).map((candidate) => {
+    resetRovingTabindex(candidate);
+  });
+};
+
+/**
+ * Returns all candidates currently in the focusgroup. This
+ * includes all focusable elements except the ones that capture
+ * arrow key events in some form (video, audio, input type text, ...)
+ * @param {Element} element
+ * @returns {Element[]} An array of focusgroup candidates
+ */
+const getCandidates = (element) => {
+  if (!element) return null;
+
+  const candidates = [];
+  let candidate = getFirstChild(element);
+
+  while (candidate) {
+    if (isFocusgroupCandidate(candidate)) {
+      candidates.push(candidate);
+    }
+
+    // Look deeper
+    const firstChild = getFirstChild(candidate);
+    if (firstChild) {
+      candidates.concat(getCandidates(firstChild));
+    }
+
+    candidate = candidate.nextElementSibling;
+  }
+
+  return candidates;
 };
 
 /**
@@ -79,7 +232,7 @@ export const isFocusgroupCandidate = (element, options) => {
  * @param {Element} element
  * @returns {Element | ShadowRoot}
  */
-export const getRoot = (element) => {
+const getRoot = (element) => {
   return element.shadowRoot || element;
 };
 
@@ -107,7 +260,7 @@ export const getChildren = (element) => {
  * @param {Element} element
  * @returns {Element | null}
  */
-export const getParent = (element) => {
+const getParent = (element) => {
   if (element.assignedSlot !== null) {
     return element.assignedSlot;
   }
@@ -122,27 +275,14 @@ export const getParent = (element) => {
 };
 
 /**
- *
+ * Returns the first child, including slotted elements
  * @param {Element} element
  * @returns {Element | null}
  */
-export const getFirstChild = (element) => {
+const getFirstChild = (element) => {
   const children = getChildren(element);
   if (children?.length > 0) {
     return children[0];
-  }
-  return null;
-};
-
-/**
- *
- * @param {Element} element
- * @returns {Element | null}
- */
-export const getLastChild = (element) => {
-  const children = getChildren(element);
-  if (children?.length > 0) {
-    return children[children.length - 1];
   }
   return null;
 };
@@ -152,7 +292,7 @@ export const getLastChild = (element) => {
  * @param {Element} element
  * @returns {Element | null}
  */
-export const getParentFocusgroup = (element) => {
+const getParentFocusgroup = (element) => {
   let currentElement = getParent(element);
 
   while (currentElement != null) {
@@ -187,45 +327,6 @@ export const getDirectionMap = (element) => {
 };
 
 /**
- * Gets the parent node that is part of a parent focusgroup
- * @param {Element} element
- * @returns {Element | null}
- */
-export const getContainerNodeOfNearestParentFocusgroup = (element) => {
-  let currentElement = element;
-
-  while (currentElement != null) {
-    const currentParent = getParent(currentElement);
-    if (isFocusgroup(currentParent)) {
-      return currentElement;
-    }
-
-    currentElement = currentParent;
-  }
-
-  return null;
-};
-
-/**
- * Find the one ancestor focusgroup that is not extended
- * @param {Element} element
- * @returns {Element | null}
- */
-export const getAncestorFocusgroup = (element) => {
-  let currentElement = element;
-
-  while (currentElement != null) {
-    if (isFocusgroup(currentElement) && !getOptions(currentElement).extend) {
-      return currentElement;
-    }
-
-    currentElement = getParent(currentElement);
-  }
-
-  return null;
-};
-
-/**
  * Get options of the current focusgroup
  * @param {Element} focusGroup
  * @returns {FocusgroupOptions}
@@ -237,8 +338,8 @@ export const getOptions = (focusGroup) => {
     vertical: optionsString.includes(" vertical "),
     horizontal: optionsString.includes(" horizontal "),
     wrap: optionsString.includes(" wrap "),
-    extend: optionsString.includes(" extend "),
     grid: optionsString.includes(" grid "),
+    none: optionsString.includes(" none "),
   };
   // Auto case
   if ((!options.vertical && !options.horizontal) || options.auto) {
@@ -253,112 +354,67 @@ export const getOptions = (focusGroup) => {
 };
 
 /**
- * Search for nested focusgroups and return an array of the results
- * @param {Element} startNode
- * @returns {Element[]} Focusgroups
+ * Recursively walk the DOM tree to find the next best focusgroup candidate
+ * @param {Element} element The starting node, usually the currently focused element
+ * @param {boolean} forward Whether to walk the tree forward or backwards
+ * @param {boolean} childSearch Whether to search for candidates in the child nodes
+ * @param {boolean} parentSearch Wheter to walk up to siblings of parents to search for candidates
+ * @param {number} index Iteration count of the recursion
+ * @returns {Element | null} The next focusgroup candidate or null if there is none
  */
-export const getNestedFocusgroups = (startNode) => {
-  const focusgroups = [];
+export const findNextCandidate = (
+  element,
+  forward = true,
+  childSearch = true,
+  parentSearch = true,
+  index = 0
+) => {
+  // Exit criteria 1: element is a candidate
+  if (index > 0 && isFocusable(element)) return element;
 
-  /**
-   *
-   * @param {Element} element
-   */
-  const findNestedFocusgroups = (element) => {
-    let currentNode = element;
-    while (currentNode) {
-      if (isFocusgroup(currentNode)) {
-        focusgroups.push(currentNode);
-      }
+  // Exit criteria 2: element is a focusgroup, either the parent or a focusgroup=none
+  if (index > 0 && isFocusgroup(element)) return null;
 
-      const child = getFirstChild(currentNode);
-      if (child != null) {
-        findNestedFocusgroups(child);
-      }
+  let candidate = null;
 
-      currentNode = currentNode.nextElementSibling;
-    }
-  };
-
-  // Initialize tree search
-  findNestedFocusgroups(getFirstChild(startNode));
-
-  return focusgroups;
-};
-
-/**
- *
- * @param {Element} startNode
- * @param {number} direction
- * @returns {Element | null}
- */
-export const findNestedCandidate = (element, direction, _options, key) => {
-  let currentElement = element;
-
-  while (currentElement) {
-    // Check if we have a match
-    const options = getOptions(getParent(element));
-    // debugger;
-    if (
-      currentElement.matches(focusableSelector) &&
-      isFocusgroupCandidate(currentElement, options) &&
-      isKeyMatchingDirection(key, options)
-    ) {
-      // TODO: only return if
-      // 1. this belongs to the original focusgroup, or
-      // 2. an extended focusgroup that is not the original one goes in the same direction
-      return currentElement;
-    }
-
-    // Check if there are nested elements
-    const child =
-      DIRECTION.NEXT === direction
-        ? getFirstChild(currentElement)
-        : getLastChild(currentElement);
-    if (child != null) {
-      return findNestedCandidate(child, direction, null, key);
-    }
-
-    currentElement =
-      DIRECTION.NEXT === direction
-        ? currentElement.nextElementSibling
-        : currentElement.previousElementSibling;
+  // Search children
+  const children = getChildren(element);
+  if (childSearch && children?.length) {
+    const nextChild = forward ? children[0] : children[children.length - 1];
+    candidate = findNextCandidate(nextChild, forward, true, false, index + 1);
   }
 
-  return currentElement;
-};
-
-export const findCousinCandidate = (element, direction, key) => {
-  if (!element) {
-    return null;
+  // Search siblings
+  const sibling = forward
+    ? element.nextElementSibling
+    : element.previousElementSibling;
+  if (!candidate && sibling) {
+    candidate = findNextCandidate(sibling, forward, true, false, index + 1);
   }
 
-  // 1. find container inside parent focusgroup
-  // 2. go to next/prev sibling
-  // 3. find nested candidate
-  // 4. if candidate, return
-  // 5. if no candidate and extend, find next parent focusgroup
-
-  const container = getContainerNodeOfNearestParentFocusgroup(element);
-  let currentElement =
-    direction === DIRECTION.NEXT
-      ? container.nextElementSibling
-      : container.previousElementSibling;
-  while (currentElement) {
-    const candidate = findNestedCandidate(currentElement, direction, null, key);
-    if (candidate) {
-      return candidate;
-    }
-    currentElement =
-      direction === DIRECTION.NEXT
-        ? currentElement.nextElementSibling
-        : currentElement.previousElementSibling;
-  }
-
+  // Search parent
   const parent = getParent(element);
-  if (getOptions(parent).extend) {
-    return findCousinCandidate(parent, direction, key);
+  if (!candidate && parentSearch && parent && !isFocusgroup(parent)) {
+    candidate = findNextCandidate(parent, forward, false, true, index + 1);
   }
 
-  return null;
+  return candidate;
+};
+
+export const findCandidates = (element, index = 0) => {
+  // Exit criteria 1: element is a focusgroup, either the parent or a focusgroup=none
+  if (index > 0 && isFocusgroup(element)) {
+    return [];
+  }
+
+  let candidates = [];
+  const children = Array.from(getChildren(element));
+  children.map((childnode) => {
+    if (isFocusable(childnode)) {
+      candidates.push(childnode);
+    }
+    candidates = [...candidates, ...findCandidates(childnode)];
+  });
+
+  return candidates;
 };

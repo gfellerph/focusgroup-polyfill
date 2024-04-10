@@ -22,12 +22,15 @@
     <h2>Regular focusgroup</h2>
     <div focusgroup>
       <button id="regular-focusgroup-button-1">Button 1</button>
+      <input type="text" name="testinput" id="regular-focusgroup-textinput" />
       <button id="regular-focusgroup-button-2">Button 2</button>
       <a href="#">Link 3</a>
       I'm just some text
       <button>Button 4</button>
-      <button disabled="disabled" tabindex="0">not today</button>
-      <span tabindex="-1">I'm focusable too</span>
+      <button disabled tabindex="0">not today</button>
+      <span tabindex="0">I'm focusable</span>
+      -
+      <span tabindex="-1">I'm focusable too, but only throught JS</span>
       <button id="regular-focusgroup-button-5">Button 6</button>
     </div>
 
@@ -82,7 +85,7 @@
       <button id="horizontal-extending-vertical-button-3">
         Horizontal button 3
       </button>
-      <div focusgroup="vertical extend" class="vertical">
+      <div class="vertical">
         <button id="horizontal-extending-vertical-button-3-1">
           Vertical button 3.1
         </button>
@@ -106,7 +109,7 @@
       <button>Vertical button 1</button>
       <button>Vertical button 2</button>
       <button>Vertical button 3</button>
-      <div focusgroup="horizontal extend">
+      <div focusgroup="horizontal">
         <button>Horizontal button 3.1</button>
         <button>Horizontal button 3.2</button>
         <button>Horizontal button 3.3</button>
@@ -117,26 +120,26 @@
 
     <h2>Simple all extending focusgroups</h2>
     <div focusgroup>
-      <div focusgroup="vertical extend">
+      <div focusgroup="vertical">
         <button>Extending button 1</button>
       </div>
-      <div focusgroup="vertical extend">
+      <div focusgroup="vertical">
         <button>Extending button 2</button>
       </div>
-      <div focusgroup="vertical extend">
+      <div focusgroup="vertical">
         <button>Extending button 3</button>
       </div>
-      <div focusgroup="vertical extend">
+      <div focusgroup="vertical">
         <button>Extending button 4</button>
       </div>
-      <div focusgroup="vertical extend">
+      <div focusgroup="vertical">
         <button>Extending button 5</button>
       </div>
     </div>
 
     <h2 id="vertical-nested">Vertical nested in horizontal</h2>
     <div class="navigation" focusgroup>
-      <div focusgroup="extend horizontal">
+      <div focusgroup="horizontal">
         <button id="vertical-nested-button-1">Button 1</button>
         <div class="vertical" focusgroup="vertical">
           <a href="#" id="vertical-nested-h-g1-button-1">Nav item 1</a>
@@ -146,7 +149,7 @@
           <a href="#">Nav item 5</a>
         </div>
       </div>
-      <div focusgroup="extend horizontal">
+      <div focusgroup="horizontal">
         <button id="vertical-nested-button-2">Button 2</button>
         <div class="vertical" focusgroup="vertical">
           <a href="#" id="vertical-nested-h-g2-button-1">Nav item 1</a>
@@ -156,7 +159,7 @@
           <a href="#">Nav item 5</a>
         </div>
       </div>
-      <div focusgroup="extend horizontal">
+      <div focusgroup="horizontal">
         <button>Button 3</button>
         <div class="vertical" focusgroup="vertical">
           <a href="#">Nav item 1</a>
@@ -200,22 +203,22 @@
           <span>
             <template shadowrootmode="open">
               <link rel="stylesheet" href="style.css" />
-              <span focusgroup="extend" part="shadow">
+              <span part="shadow">
                 <button>Shadow button 2</button>
                 <span>
                   <template shadowrootmode="open">
                     <link rel="stylesheet" href="style.css" />
-                    <span focusgroup="extend" part="shadow">
+                    <span part="shadow">
                       <button>Shadow button 3</button>
                       <span>
                         <template shadowrootmode="open">
                           <link rel="stylesheet" href="style.css" />
-                          <span focusgroup="extend" part="shadow">
+                          <span part="shadow">
                             <button>Shadow button 4</button>
                             <span>
                               <template shadowrootmode="open">
                                 <link rel="stylesheet" href="style.css" />
-                                <span focusgroup="extend" part="shadow">
+                                <span part="shadow">
                                   <button>Shadow button 5</button>
                                 </span>
                               </template>
@@ -268,11 +271,11 @@
       <span>
         <template shadowrootmode="open">
           <link rel="stylesheet" href="style.css" />
-          <span focusgroup="extend" part="shadow">
+          <span part="shadow">
             <button id="mixed-dom-button-3">3</button>
             <button id="mixed-dom-button-4">4</button>
             <span part="slot">
-              <slot focusgroup="extend"></slot>
+              <slot></slot>
             </span>
             <button id="mixed-dom-button-7">7</button>
             <button id="mixed-dom-button-8">8</button>
@@ -288,7 +291,7 @@
       <button>Button 1</button>
       <button>Button 2</button>
       <button>Button 3</button>
-      <div focusgroup="extend">
+      <div>
         <button>Nested Button 1</button>
         <button>Nested Button 2</button>
         <button>Nested Button 3</button>
@@ -307,7 +310,7 @@
       <div>
         <template shadowrootmode="open">
           <link rel="stylesheet" href="style.css" />
-          <div focusgroup="extend" part="shadow">
+          <div part="shadow">
             <button>Nested Button 1</button>
             <button>Nested Button 2</button>
             <button>Nested Button 3</button>
@@ -326,7 +329,7 @@
       <div>
         <div>
           <div>
-            <div focusgroup="extend">
+            <div>
               <button>Nested Button 1</button>
               <button>Nested Button 2</button>
               <button>Nested Button 3</button>
@@ -344,7 +347,7 @@
     <div focusgroup>
       <button>
         I'm a button with links 1
-        <span focusgroup="extend">
+        <span>
           <a href="http://">Link 1</a>
           <a href="http://">Link 2</a>
           <a href="http://">Link 3</a>
@@ -354,7 +357,7 @@
       </button>
       <button>
         I'm a button with links 2
-        <span focusgroup="extend">
+        <span>
           <a href="http://">Link 1</a>
           <a href="http://">Link 2</a>
           <a href="http://">Link 3</a>
@@ -362,7 +365,7 @@
           <a href="http://">Link 5</a>
         </span>
       </button>
-      <button focusgroup="extend">
+      <button>
         I'm a button with links 3
         <a href="http://">Link 1</a>
         <a href="http://">Link 2</a>
@@ -416,6 +419,27 @@
       <button>Button 5</button>
     </div>
 
+    <h2>A list of detail summary elements</h2>
+    <div focusgroup="">
+      <details>
+        <summary>Summary</summary>
+        <summary>Summary</summary>
+        <button>just a button here</button>
+      </details>
+      <details>
+        <summary>Summary</summary>
+        <input type="email" />
+      </details>
+      <details>
+        <summary>Summary</summary>
+        <button disabled>I'm disabled</button>
+      </details>
+      <details>
+        <summary>Summary</summary>
+        Details
+      </details>
+    </div>
+
     <h2>Different focusable elements</h2>
     <div focusgroup>
       <button>Button 1</button>
@@ -444,9 +468,9 @@
         Your browser does not support HTML video.
       </video> -->
       <button>Button 3</button>
-      <details focusgroup="extend">
+      <details>
         <summary>Summary</summary>
-        Details
+        <input type="text" />
       </details>
       <button>Button 3</button>
       <input type="text" />
