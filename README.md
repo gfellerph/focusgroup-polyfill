@@ -1,12 +1,10 @@
 # Focusgroup polyfill
 
+An attempt to create a polyfill for the [`focusgroup` proposal](https://open-ui.org/components/focusgroup.explainer/) by the Open UI Community Group.
+
 ## Feature roadmap
 
-- [ ] Signalling to assistive technology that alternative keyboard interactions are available
+- [X] Signalling to assistive technology that alternative keyboard interactions are available
 - [ ] Grid option for focusgroup
 - [ ] Focus by text search
 - [ ] Support for CSS scenarios
-
-## Questions
-
-- Should an option "tabs" be added for configuring if the polyfill should not add tabindex="-1" to focusgroup candidates?
