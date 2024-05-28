@@ -11,8 +11,8 @@
   <body>
     <h1>Testing focusgroups</h1>
     <p>
-      This is a test page for a focusgroup implementation that works across
-      shadow dom boundaries according to the
+      This is a test page for a focusgroup implementation that works across shadow dom boundaries
+      according to the
       <a href="https://open-ui.org/components/focusgroup.explainer/"
         >non active Open UI focusgroup explainer</a
       >.
@@ -76,32 +76,16 @@
 
     <h2>Simple horizontal with extending vertical focusgroups</h2>
     <div focusgroup="horizontal">
-      <button id="horizontal-extending-vertical-button-1">
-        Horizontal button 1
-      </button>
-      <button id="horizontal-extending-vertical-button-2">
-        Horizontal button 2
-      </button>
-      <button id="horizontal-extending-vertical-button-3">
-        Horizontal button 3
-      </button>
+      <button id="horizontal-extending-vertical-button-1">Horizontal button 1</button>
+      <button id="horizontal-extending-vertical-button-2">Horizontal button 2</button>
+      <button id="horizontal-extending-vertical-button-3">Horizontal button 3</button>
       <div class="vertical">
-        <button id="horizontal-extending-vertical-button-3-1">
-          Vertical button 3.1
-        </button>
-        <button id="horizontal-extending-vertical-button-3-2">
-          Vertical button 3.2
-        </button>
-        <button id="horizontal-extending-vertical-button-3-3">
-          Vertical button 3.3
-        </button>
+        <button id="horizontal-extending-vertical-button-3-1">Vertical button 3.1</button>
+        <button id="horizontal-extending-vertical-button-3-2">Vertical button 3.2</button>
+        <button id="horizontal-extending-vertical-button-3-3">Vertical button 3.3</button>
       </div>
-      <button id="horizontal-extending-vertical-button-4">
-        Horizontal button 4
-      </button>
-      <button id="horizontal-extending-vertical-button-5">
-        Horizontal button 5
-      </button>
+      <button id="horizontal-extending-vertical-button-4">Horizontal button 4</button>
+      <button id="horizontal-extending-vertical-button-5">Horizontal button 5</button>
     </div>
 
     <h2>Simple vertical with extending horizontal focusgroup</h2>
@@ -253,10 +237,11 @@
       <template shadowrootmode="open">
         <link rel="stylesheet" href="style.css" />
         <div part="shadow">
-          <slot focusgroup></slot>
+          <slot focusgroup> </slot>
+          <slot name="bla"></slot>
         </div>
       </template>
-      <button>Shadow button 1</button>
+      <button slot="bla">Shadow button 1</button>
       <button>Shadow button 2</button>
       <button>Shadow button 3</button>
       <button>Shadow button 4</button>
@@ -392,9 +377,7 @@
 
     <h2>Simple dom interference</h2>
     <button id="dom-interference-add-button">Add button to focusgroup</button>
-    <button id="dom-interference-remove-button">
-      Remove button from focusgroup
-    </button>
+    <button id="dom-interference-remove-button">Remove button from focusgroup</button>
     <div focusgroup id="dom-interference-container">
       <button>Button 1</button>
       <button>Button 2</button>
@@ -484,15 +467,13 @@
       <button>Button 3</button>
     </div>
     <ul>
-      <li>
-        Input text in focusgroup disables moving the cursor inside the textfield
-      </li>
+      <li>Input text in focusgroup disables moving the cursor inside the textfield</li>
       <li>The select element is a focusgroup trap</li>
       <li>Audio elements have conflicting usage of arrow keys</li>
       <li>Video is a focusgroup trap</li>
       <li>
-        In details/summary, the focusable element is not a child of the
-        focusgroup, the details element needs to have an extending focusgroup
+        In details/summary, the focusable element is not a child of the focusgroup, the details
+        element needs to have an extending focusgroup
       </li>
     </ul>
 
