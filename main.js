@@ -99,7 +99,7 @@ function handleKeydown(event, focusTarget, focusGroup) {
 
   const key = `${event.getModifierState("Meta") ? "Meta" : ""}${event.key}`;
   const options = getOptions(focusGroup);
-  const keyMap = getDirectionMap(focusTarget);
+  const keyMap = getDirectionMap(focusTarget, options);
 
   if (key in keyMap) {
     focusNode(
@@ -147,7 +147,7 @@ function focusNode(
     // Key event is handled by the focusgroup, prevent other default events
     event.preventDefault();
     activeElement.removeEventListener("keydown", handleKeydown);
-    setFocus(nodeToFocus, activeElement, activeFocusGroup);
+    setFocus(nodeToFocus, activeElement);
   }
 }
 
@@ -157,15 +157,23 @@ function focusNode(
  * @param {Element} previousTarget
  */
 function setFocus(target, previousTarget) {
-  // Refresh last target for focusgroup
+  // Refresh focusgroup memory
   setRovingTabindex(previousTarget);
   resetRovingTabindex(target);
   target.focus();
 }
 
+/**
+ * Feature detection for focusgroup
+ * @returns {boolean}
+ */
+function focusgroupSupported() {
+  const div = document.createElement("div");
+  return "focusgroup" in div;
+}
+
 // Start polyfill
-// TODO: check if the browser supports focusgroup
 // TODO: let users define the scope where they want focusgroup to be active
-if (window) {
+if (window && !focusgroupSupported()) {
   registerFocusinListener(window);
 }

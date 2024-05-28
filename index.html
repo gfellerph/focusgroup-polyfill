@@ -11,8 +11,8 @@
   <body>
     <h1>Testing focusgroups</h1>
     <p>
-      This is a test page for a focusgroup implementation that works across shadow dom boundaries
-      according to the
+      This is a test page for a focusgroup implementation that works across
+      shadow dom boundaries according to the
       <a href="https://open-ui.org/components/focusgroup.explainer/"
         >non active Open UI focusgroup explainer</a
       >.
@@ -48,7 +48,7 @@
     </div>
 
     <h2>Horizontal focusgroup</h2>
-    <div focusgroup="horizontal">
+    <div focusgroup="inline">
       <button id="horizontal-focusgroup-button-1">Button 1</button>
       <button id="horizontal-focusgroup-button-2">Button 2</button>
       <button>Button 3</button>
@@ -57,7 +57,7 @@
     </div>
 
     <h2>Vertical focusgroup</h2>
-    <div class="vertical" focusgroup="vertical">
+    <div class="vertical" focusgroup="block">
       <button id="vertical-focusgroup-button-1">Button 1</button>
       <button id="vertical-focusgroup-button-2">Button 2</button>
       <button>Button 3</button>
@@ -66,7 +66,7 @@
     </div>
 
     <h2>Wrong usage of horizontal and vertical focusgroup</h2>
-    <div focusgroup="horizontal vertical">
+    <div focusgroup="inline block">
       <button id="wrong-hv-focusgroup-button-1">Button 1</button>
       <button id="wrong-hv-focusgroup-button-2">Button 2</button>
       <button>Button 3</button>
@@ -75,25 +75,41 @@
     </div>
 
     <h2>Simple horizontal with extending vertical focusgroups</h2>
-    <div focusgroup="horizontal">
-      <button id="horizontal-extending-vertical-button-1">Horizontal button 1</button>
-      <button id="horizontal-extending-vertical-button-2">Horizontal button 2</button>
-      <button id="horizontal-extending-vertical-button-3">Horizontal button 3</button>
+    <div focusgroup="inline">
+      <button id="horizontal-extending-vertical-button-1">
+        Horizontal button 1
+      </button>
+      <button id="horizontal-extending-vertical-button-2">
+        Horizontal button 2
+      </button>
+      <button id="horizontal-extending-vertical-button-3">
+        Horizontal button 3
+      </button>
       <div class="vertical">
-        <button id="horizontal-extending-vertical-button-3-1">Vertical button 3.1</button>
-        <button id="horizontal-extending-vertical-button-3-2">Vertical button 3.2</button>
-        <button id="horizontal-extending-vertical-button-3-3">Vertical button 3.3</button>
+        <button id="horizontal-extending-vertical-button-3-1">
+          Vertical button 3.1
+        </button>
+        <button id="horizontal-extending-vertical-button-3-2">
+          Vertical button 3.2
+        </button>
+        <button id="horizontal-extending-vertical-button-3-3">
+          Vertical button 3.3
+        </button>
       </div>
-      <button id="horizontal-extending-vertical-button-4">Horizontal button 4</button>
-      <button id="horizontal-extending-vertical-button-5">Horizontal button 5</button>
+      <button id="horizontal-extending-vertical-button-4">
+        Horizontal button 4
+      </button>
+      <button id="horizontal-extending-vertical-button-5">
+        Horizontal button 5
+      </button>
     </div>
 
     <h2>Simple vertical with extending horizontal focusgroup</h2>
-    <div focusgroup="vertical">
+    <div focusgroup="block">
       <button>Vertical button 1</button>
       <button>Vertical button 2</button>
       <button>Vertical button 3</button>
-      <div focusgroup="horizontal">
+      <div focusgroup="inline">
         <button>Horizontal button 3.1</button>
         <button>Horizontal button 3.2</button>
         <button>Horizontal button 3.3</button>
@@ -104,28 +120,28 @@
 
     <h2>Simple all extending focusgroups</h2>
     <div focusgroup>
-      <div focusgroup="vertical">
+      <div focusgroup="block">
         <button>Extending button 1</button>
       </div>
-      <div focusgroup="vertical">
+      <div focusgroup="block">
         <button>Extending button 2</button>
       </div>
-      <div focusgroup="vertical">
+      <div focusgroup="block">
         <button>Extending button 3</button>
       </div>
-      <div focusgroup="vertical">
+      <div focusgroup="block">
         <button>Extending button 4</button>
       </div>
-      <div focusgroup="vertical">
+      <div focusgroup="block">
         <button>Extending button 5</button>
       </div>
     </div>
 
     <h2 id="vertical-nested">Vertical nested in horizontal</h2>
     <div class="navigation" focusgroup>
-      <div focusgroup="horizontal">
+      <div focusgroup="inline">
         <button id="vertical-nested-button-1">Button 1</button>
-        <div class="vertical" focusgroup="vertical">
+        <div class="vertical" focusgroup="block">
           <a href="#" id="vertical-nested-h-g1-button-1">Nav item 1</a>
           <a href="#" id="vertical-nested-h-g1-button-2">Nav item 2</a>
           <a href="#">Nav item 3</a>
@@ -133,9 +149,9 @@
           <a href="#">Nav item 5</a>
         </div>
       </div>
-      <div focusgroup="horizontal">
+      <div focusgroup="inline">
         <button id="vertical-nested-button-2">Button 2</button>
-        <div class="vertical" focusgroup="vertical">
+        <div class="vertical" focusgroup="block">
           <a href="#" id="vertical-nested-h-g2-button-1">Nav item 1</a>
           <a href="#">Nav item 2</a>
           <a href="#">Nav item 3</a>
@@ -143,9 +159,9 @@
           <a href="#">Nav item 5</a>
         </div>
       </div>
-      <div focusgroup="horizontal">
+      <div focusgroup="inline">
         <button>Button 3</button>
-        <div class="vertical" focusgroup="vertical">
+        <div class="vertical" focusgroup="block">
           <a href="#">Nav item 1</a>
           <a href="#">Nav item 2</a>
           <a href="#">Nav item 3</a>
@@ -377,7 +393,9 @@
 
     <h2>Simple dom interference</h2>
     <button id="dom-interference-add-button">Add button to focusgroup</button>
-    <button id="dom-interference-remove-button">Remove button from focusgroup</button>
+    <button id="dom-interference-remove-button">
+      Remove button from focusgroup
+    </button>
     <div focusgroup id="dom-interference-container">
       <button>Button 1</button>
       <button>Button 2</button>
@@ -467,13 +485,15 @@
       <button>Button 3</button>
     </div>
     <ul>
-      <li>Input text in focusgroup disables moving the cursor inside the textfield</li>
+      <li>
+        Input text in focusgroup disables moving the cursor inside the textfield
+      </li>
       <li>The select element is a focusgroup trap</li>
       <li>Audio elements have conflicting usage of arrow keys</li>
       <li>Video is a focusgroup trap</li>
       <li>
-        In details/summary, the focusable element is not a child of the focusgroup, the details
-        element needs to have an extending focusgroup
+        In details/summary, the focusable element is not a child of the
+        focusgroup, the details element needs to have an extending focusgroup
       </li>
     </ul>
 

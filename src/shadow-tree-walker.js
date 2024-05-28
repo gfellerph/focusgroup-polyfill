@@ -8,11 +8,10 @@ import {
  * Option type for focusgroups
  * @typedef {object} FocusgroupOptions
  * @property {boolean} wrap
- * @property {boolean} horizontal
- * @property {boolean} vertical
- * @property {boolean} extend
+ * @property {boolean} inline
+ * @property {boolean} block
  * @property {boolean} grid
- * @property {boolean} auto
+ * @property {boolean} none
  */
 
 /**
@@ -309,21 +308,36 @@ const getParentFocusgroup = (element) => {
 /**
  * Figure out in which direction to walk the DOM tree
  * @param {Element} element
+ * @param {FocusgroupOptions} options Current focusgroup options
  * @returns {object} Direction mappings
  */
-export const getDirectionMap = (element) => {
+export const getDirectionMap = (element, options) => {
   const isLTR = getComputedStyle(element).direction === "ltr";
+  // TODO: improve block/inline direction detection
 
-  return {
-    ArrowLeft: isLTR ? DIRECTION.PREVIOUS : DIRECTION.NEXT,
-    ArrowRight: isLTR ? DIRECTION.NEXT : DIRECTION.PREVIOUS,
-    ArrowUp: DIRECTION.PREVIOUS,
-    ArrowDown: DIRECTION.NEXT,
-    End: DIRECTION.LAST,
-    Home: DIRECTION.FIRST,
-    MetaArrowRight: isLTR ? DIRECTION.LAST : DIRECTION.FIRST,
-    MetaArrowLeft: isLTR ? DIRECTION.FIRST : DIRECTION.LAST,
-  };
+  let keymap = {};
+
+  if (options.inline) {
+    keymap = {
+      ...keymap,
+      ArrowLeft: isLTR ? DIRECTION.PREVIOUS : DIRECTION.NEXT,
+      ArrowRight: isLTR ? DIRECTION.NEXT : DIRECTION.PREVIOUS,
+      End: DIRECTION.LAST,
+      Home: DIRECTION.FIRST,
+      MetaArrowRight: isLTR ? DIRECTION.LAST : DIRECTION.FIRST,
+      MetaArrowLeft: isLTR ? DIRECTION.FIRST : DIRECTION.LAST,
+    };
+  }
+
+  if (options.block) {
+    keymap = {
+      ...keymap,
+      ArrowUp: DIRECTION.PREVIOUS,
+      ArrowDown: DIRECTION.NEXT,
+    };
+  }
+
+  return keymap;
 };
 
 /**
@@ -334,22 +348,19 @@ export const getDirectionMap = (element) => {
 export const getOptions = (focusGroup) => {
   const optionsString = ` ${focusGroup.getAttribute("focusgroup").trim()} `;
   const options = {
-    auto: optionsString.includes(" auto "),
-    vertical: optionsString.includes(" vertical "),
-    horizontal: optionsString.includes(" horizontal "),
+    block: optionsString.includes(" block "),
+    inline: optionsString.includes(" inline "),
     wrap: optionsString.includes(" wrap "),
     grid: optionsString.includes(" grid "),
     none: optionsString.includes(" none "),
   };
-  // Auto case
-  if ((!options.vertical && !options.horizontal) || options.auto) {
+
+  // "Both" case
+  if (!options.block && !options.inline) {
     options.vertical = true;
-    options.horizontal = true;
+    options.inline = true;
   }
-  // Only wrapping a child focusgroup does not make sense
-  if (options.extend && options.wrap) {
-    options.wrap = false;
-  }
+
   return options;
 };
 
