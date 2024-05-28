@@ -12,6 +12,7 @@ import {
  * @property {boolean} block
  * @property {boolean} grid
  * @property {boolean} none
+ * @property {boolean} nomemory
  */
 
 /**
@@ -134,6 +135,9 @@ export const rovingFocusgroups = new WeakMap();
  */
 export const initializeRovingTabindex = (element) => {
   if (rovingFocusgroups.has(element)) return;
+
+  // TODO: add mutation observer for child events and initialize new candidates with tabindex=-1
+  // TODO: add mutation observer for focusgroup attribute no-memory to disable roving tabindex
 
   const candidates = findCandidates(element);
   const focusedCandidate = candidates.filter((candidate) =>
@@ -353,11 +357,12 @@ export const getOptions = (focusGroup) => {
     wrap: optionsString.includes(" wrap "),
     grid: optionsString.includes(" grid "),
     none: optionsString.includes(" none "),
+    nomemory: optionsString.includes(" no-memory "),
   };
 
   // "Both" case
   if (!options.block && !options.inline) {
-    options.vertical = true;
+    options.block = true;
     options.inline = true;
   }
 
