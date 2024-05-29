@@ -139,9 +139,9 @@
 
     <h2 id="vertical-nested">Vertical nested in horizontal</h2>
     <div class="navigation" focusgroup>
-      <div focusgroup="inline">
+      <div>
         <button id="vertical-nested-button-1">Button 1</button>
-        <div class="vertical" focusgroup="block">
+        <div focusgroup="block">
           <a href="#" id="vertical-nested-h-g1-button-1">Nav item 1</a>
           <a href="#" id="vertical-nested-h-g1-button-2">Nav item 2</a>
           <a href="#">Nav item 3</a>
@@ -149,9 +149,9 @@
           <a href="#">Nav item 5</a>
         </div>
       </div>
-      <div focusgroup="inline">
+      <div>
         <button id="vertical-nested-button-2">Button 2</button>
-        <div class="vertical" focusgroup="block">
+        <div focusgroup="block">
           <a href="#" id="vertical-nested-h-g2-button-1">Nav item 1</a>
           <a href="#">Nav item 2</a>
           <a href="#">Nav item 3</a>
@@ -159,9 +159,9 @@
           <a href="#">Nav item 5</a>
         </div>
       </div>
-      <div focusgroup="inline">
+      <div>
         <button>Button 3</button>
-        <div class="vertical" focusgroup="block">
+        <div focusgroup="block">
           <a href="#">Nav item 1</a>
           <a href="#">Nav item 2</a>
           <a href="#">Nav item 3</a>
@@ -440,6 +440,24 @@
         Details
       </details>
     </div>
+
+    <h2>Focusgroup in a popover</h2>
+    <button popovertarget="testpopover">Open popover</button>
+    <div popover id="testpopover" focusgroup>
+      <button autofocus id="testpopover-button-1">Button 1</button>
+      <button id="testpopover-button-2">Button 2</button>
+      <button id="testpopover-button-3">Button 3</button>
+      <button id="testpopover-button-4">Button 4</button>
+    </div>
+
+    <h2>Focusgroup in a dialog</h2>
+    <button onclick="this.nextElementSibling.showModal()">Open dialog</button>
+    <dialog focusgroup>
+      <button autofocus id="testpopover-button-1">Button 1</button>
+      <button id="testpopover-button-2">Button 2</button>
+      <button id="testpopover-button-3">Button 3</button>
+      <button id="testpopover-button-4">Button 4</button>
+    </dialog>
 
     <h2>Different focusable elements</h2>
     <div focusgroup>

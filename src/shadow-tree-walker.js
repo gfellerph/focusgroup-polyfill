@@ -338,6 +338,8 @@ export const getDirectionMap = (element, options) => {
       ...keymap,
       ArrowUp: DIRECTION.PREVIOUS,
       ArrowDown: DIRECTION.NEXT,
+      MetaArrowUp: DIRECTION.FIRST,
+      MetaArrowDown: DIRECTION.LAST,
     };
   }
 
@@ -388,16 +390,17 @@ export const findNextCandidate = (
   // Exit criteria 1: element is a candidate
   if (index > 0 && isFocusable(element)) return element;
 
-  // Exit criteria 2: element is a focusgroup, either the parent or a focusgroup=none
-  if (index > 0 && isFocusgroup(element)) return null;
-
+  const isForeignFocusgroup = index > 0 && isFocusgroup(element);
   let candidate = null;
 
-  // Search children
-  const children = getChildren(element);
-  if (childSearch && children?.length) {
-    const nextChild = forward ? children[0] : children[children.length - 1];
-    candidate = findNextCandidate(nextChild, forward, true, false, index + 1);
+  // Only start child search if element is not a focusgroup, otherwise, continue with sibling search
+  if (!isForeignFocusgroup) {
+    // Search children
+    const children = getChildren(element);
+    if (childSearch && children?.length) {
+      const nextChild = forward ? children[0] : children[children.length - 1];
+      candidate = findNextCandidate(nextChild, forward, true, false, index + 1);
+    }
   }
 
   // Search siblings
@@ -410,13 +413,25 @@ export const findNextCandidate = (
 
   // Search parent
   const parent = getParent(element);
-  if (!candidate && parentSearch && parent && !isFocusgroup(parent)) {
+  if (
+    !candidate &&
+    !isForeignFocusgroup &&
+    parentSearch &&
+    parent &&
+    !isFocusgroup(parent)
+  ) {
     candidate = findNextCandidate(parent, forward, false, true, index + 1);
   }
 
   return candidate;
 };
 
+/**
+ * Get a list of candidates participating in this focusgroup
+ * @param {Element} element Starting node, should be a focusgroup but does not have to
+ * @param {number} index Index for keeping track of recurse
+ * @returns {Element[]} A list of candidates of this focusgroup
+ */
 export const findCandidates = (element, index = 0) => {
   // Exit criteria 1: element is a focusgroup, either the parent or a focusgroup=none
   if (index > 0 && isFocusgroup(element)) {
@@ -429,7 +444,7 @@ export const findCandidates = (element, index = 0) => {
     if (isFocusable(childnode)) {
       candidates.push(childnode);
     }
-    candidates = [...candidates, ...findCandidates(childnode)];
+    candidates = [...candidates, ...findCandidates(childnode, index + 1)];
   });
 
   return candidates;

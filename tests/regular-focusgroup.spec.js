@@ -18,22 +18,22 @@ test("Reference tab test", async ({ page }) => {
 
 test("Regular focusgroup arrow right", async ({ page }) => {
   await page.locator("#regular-focusgroup-button-1").press("ArrowRight");
-  await expect(page.locator("#regular-focusgroup-button-2")).toBeFocused();
+  await expect(page.locator("#regular-focusgroup-textinput")).toBeFocused();
 });
 
 test("Regular focusgroup arrow down", async ({ page }) => {
   await page.locator("#regular-focusgroup-button-1").press("ArrowDown");
-  await expect(page.locator("#regular-focusgroup-button-2")).toBeFocused();
+  await expect(page.locator("#regular-focusgroup-textinput")).toBeFocused();
 });
 
 test("Regular focusgroup arrow left", async ({ page }) => {
   await page.locator("#regular-focusgroup-button-2").press("ArrowLeft");
-  await expect(page.locator("#regular-focusgroup-button-1")).toBeFocused();
+  await expect(page.locator("#regular-focusgroup-textinput")).toBeFocused();
 });
 
 test("Regular focusgroup arrow up", async ({ page }) => {
   await page.locator("#regular-focusgroup-button-2").press("ArrowUp");
-  await expect(page.locator("#regular-focusgroup-button-1")).toBeFocused();
+  await expect(page.locator("#regular-focusgroup-textinput")).toBeFocused();
 });
 
 test("Regular focusgroup does not wrap right", async ({ page }) => {

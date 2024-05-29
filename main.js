@@ -74,6 +74,8 @@ function focusInHandler(focusEvent) {
     focusEvent.stopPropagation();
     initializeRovingTabindex(focusgroup);
 
+    // TODO: check if there are parent focusgroups and disable roving tabindex on them
+
     activeElement.addEventListener("keydown", (event) =>
       handleKeydown(event, activeElement, focusgroup)
     );
@@ -102,14 +104,7 @@ function handleKeydown(event, focusTarget, focusGroup) {
   const keyMap = getDirectionMap(focusTarget, options);
 
   if (key in keyMap) {
-    focusNode(
-      focusTarget,
-      focusGroup,
-      options,
-      key,
-      keyMap[key] === DIRECTION.NEXT,
-      event
-    );
+    focusNode(focusTarget, focusGroup, options, keyMap[key], event);
   }
 }
 
@@ -118,21 +113,17 @@ function handleKeydown(event, focusTarget, focusGroup) {
  * @param {Element} activeElement The currently focused element
  * @param {Element} activeFocusGroup The parent focusgroup of the selected element
  * @param {import("./src/shadow-tree-walker.js").FocusgroupOptions} options
- * @param {string} key Key that triggered the event, prefixed with Meta if meta key is pressed
- * @param {boolean} forward Whether the direction is forward or not
+ * @param {DIRECTION} direction Whether the direction is forward or not
  * @param {KeyboardEvent} event The event that fired
  */
-function focusNode(
-  activeElement,
-  activeFocusGroup,
-  options,
-  key,
-  forward,
-  event
-) {
-  // TODO: Check if key goes in the right direction
-
-  let nodeToFocus = findNextCandidate(activeElement, forward);
+function focusNode(activeElement, activeFocusGroup, options, direction, event) {
+  // Switch start node if meta key is pressed to enable jumping to first/last
+  const startNode =
+    direction === DIRECTION.NEXT || direction === DIRECTION.PREVIOUS
+      ? activeElement
+      : activeFocusGroup;
+  const forward = direction === DIRECTION.FIRST || direction === DIRECTION.NEXT;
+  let nodeToFocus = findNextCandidate(startNode, forward);
 
   // Handle wrapping behaviour
   if (nodeToFocus == null && options.wrap) {
