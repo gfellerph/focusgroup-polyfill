@@ -264,6 +264,12 @@
       <button>Shadow button 5</button>
     </div>
 
+    <ul aria-label="errors in the above example">
+      <li>
+        Shadow button 1 not reachable correctly and behaving weird if focused
+      </li>
+    </ul>
+
     <h2>Mixed light dom, shadow dom and slotted</h2>
     <p>Complicated use-case</p>
     <div focusgroup>
@@ -450,6 +456,24 @@
       <button id="testpopover-button-4">Button 4</button>
     </div>
 
+    <h2>Focusgroup with popover in the middle</h2>
+    <div focusgroup="">
+      <button>Button 1</button>
+      <button popovertarget="middlepopover">Open popover</button>
+      <div popover id="middlepopover">
+        <button id="middlepopover-button-2">Button 2</button>
+        <button id="middlepopover-button-3">Button 3</button>
+        <button id="middlepopover-button-4">Button 4</button>
+      </div>
+      <button>Button 5</button>
+    </div>
+
+    <ul aria-label="errors in the example above">
+      <li>
+        The popovertarget button acts as a focus trap if the popover is closed
+      </li>
+    </ul>
+
     <h2>Focusgroup in a dialog</h2>
     <button onclick="this.nextElementSibling.showModal()">Open dialog</button>
     <dialog focusgroup>
@@ -502,18 +526,6 @@
       </select>
       <button>Button 3</button>
     </div>
-    <ul>
-      <li>
-        Input text in focusgroup disables moving the cursor inside the textfield
-      </li>
-      <li>The select element is a focusgroup trap</li>
-      <li>Audio elements have conflicting usage of arrow keys</li>
-      <li>Video is a focusgroup trap</li>
-      <li>
-        In details/summary, the focusable element is not a child of the
-        focusgroup, the details element needs to have an extending focusgroup
-      </li>
-    </ul>
 
     <h2>Not focusgroups</h2>
     <div>

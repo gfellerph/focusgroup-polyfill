@@ -23,7 +23,7 @@ export const focusDisablingSelector = [
   ":where(dialog, [popover]):not([open])",
   "details:not([open]) > *:not(details > summary:first-of-type)",
   "details:not([open]) > *:not(details > summary:first-of-type) *",
-];
+].join(",");
 
 export const focusableSelector = `:where(${focusableElementsSelector})`;
 
