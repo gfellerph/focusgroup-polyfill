@@ -407,6 +407,12 @@
       <button>Button 2</button>
       <button>Button 3</button>
     </div>
+    <ul aria-label="errors in this example">
+      <li>
+        If the memory element gets removed, the roving tabindex on the other
+        elements is not being reset
+      </li>
+    </ul>
 
     <h2>Just in time options</h2>
     <fieldset>
@@ -467,12 +473,6 @@
       </div>
       <button>Button 5</button>
     </div>
-
-    <ul aria-label="errors in the example above">
-      <li>
-        The popovertarget button acts as a focus trap if the popover is closed
-      </li>
-    </ul>
 
     <h2>Focusgroup in a dialog</h2>
     <button onclick="this.nextElementSibling.showModal()">Open dialog</button>
