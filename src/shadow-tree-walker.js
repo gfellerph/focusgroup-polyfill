@@ -194,39 +194,9 @@ export const disableRovingTabindex = (element) => {
   if (rovingFocusgroups.has(element)) {
     rovingFocusgroups.delete(element);
   }
-  getCandidates(element).map((candidate) => {
+  findCandidates(element).map((candidate) => {
     resetRovingTabindex(candidate);
   });
-};
-
-/**
- * Returns all candidates currently in the focusgroup. This
- * includes all focusable elements except the ones that capture
- * arrow key events in some form (video, audio, input type text, ...)
- * @param {Element} element
- * @returns {Element[]} An array of focusgroup candidates
- */
-const getCandidates = (element) => {
-  if (!element) return null;
-
-  const candidates = [];
-  let candidate = getFirstChild(element);
-
-  while (candidate) {
-    if (isFocusgroupCandidate(candidate)) {
-      candidates.push(candidate);
-    }
-
-    // Look deeper
-    const firstChild = getFirstChild(candidate);
-    if (firstChild) {
-      candidates.concat(getCandidates(firstChild));
-    }
-
-    candidate = candidate.nextElementSibling;
-  }
-
-  return candidates;
 };
 
 /**
@@ -295,7 +265,7 @@ const getFirstChild = (element) => {
  * @param {Element} element
  * @returns {Element | null}
  */
-const getParentFocusgroup = (element) => {
+export const getParentFocusgroup = (element) => {
   let currentElement = getParent(element);
 
   while (currentElement != null) {
