@@ -20,7 +20,8 @@ export const focusDisablingSelector = [
   "[inert]",
   "[inert] *",
   ":disabled",
-  ":where(dialog, [popover]):not([open])",
+  "dialog:not([open]) *",
+  "[popover]:not(:popover-open) *",
   "details:not([open]) > *:not(details > summary:first-of-type)",
   "details:not([open]) > *:not(details > summary:first-of-type) *",
 ].join(",");
