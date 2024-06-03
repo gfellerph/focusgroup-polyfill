@@ -11,6 +11,7 @@ import {
   resetRovingTabindex,
   findNextCandidate,
   DIRECTION,
+  getParentFocusgroup,
 } from "./src/shadow-tree-walker.js";
 
 // A map for keeping track of observed root nodes
@@ -74,7 +75,12 @@ function focusInHandler(focusEvent) {
     focusEvent.stopPropagation();
     initializeRovingTabindex(focusgroup);
 
-    // TODO: check if there are parent focusgroups and disable roving tabindex on them
+    // Check if there are parent focusgroups and disable roving tabindex on them
+    let currentParentFocusgroup = getParentFocusgroup(focusgroup);
+    while (currentParentFocusgroup) {
+      disableRovingTabindex(currentParentFocusgroup);
+      currentParentFocusgroup = getParentFocusgroup(currentParentFocusgroup);
+    }
 
     activeElement.addEventListener("keydown", (event) =>
       handleKeydown(event, activeElement, focusgroup)
