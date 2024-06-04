@@ -10,7 +10,7 @@
   background-color: white;
 }
 
-[focusgroup]:has(:focus-visible) {
+[focusgroup]:not([focusgroup~="none"]):has(:focus-visible) {
   position: relative;
   outline: 2px solid grey;
 

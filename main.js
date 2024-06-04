@@ -73,7 +73,10 @@ function focusInHandler(focusEvent) {
   // If it is, start to handle keydown events
   if (isCandidate) {
     focusEvent.stopPropagation();
-    initializeRovingTabindex(focusgroup);
+    const options = getOptions(focusgroup);
+    if (!options.nomemory) {
+      initializeRovingTabindex(focusgroup);
+    }
 
     // Check if there are parent focusgroups and disable roving tabindex on them
     let currentParentFocusgroup = getParentFocusgroup(focusgroup);
@@ -82,8 +85,15 @@ function focusInHandler(focusEvent) {
       currentParentFocusgroup = getParentFocusgroup(currentParentFocusgroup);
     }
 
-    activeElement.addEventListener("keydown", (event) =>
-      handleKeydown(event, activeElement, focusgroup)
+    const keydownHandler = (event) => {
+      handleKeydown(event, activeElement, focusgroup);
+    };
+
+    activeElement.addEventListener("keydown", keydownHandler);
+    activeElement.addEventListener(
+      "blur",
+      () => activeElement.removeEventListener("keydown", keydownHandler),
+      { once: true }
     );
   } else if (
     reason === candidateReasons.KEY_CONFLICT &&
@@ -143,21 +153,12 @@ function focusNode(activeElement, activeFocusGroup, options, direction, event) {
   if (nodeToFocus) {
     // Key event is handled by the focusgroup, prevent other default events
     event.preventDefault();
-    activeElement.removeEventListener("keydown", handleKeydown);
-    setFocus(nodeToFocus, activeElement);
+    if (!options.nomemory) {
+      setRovingTabindex(activeElement);
+      resetRovingTabindex(nodeToFocus);
+    }
+    nodeToFocus.focus();
   }
-}
-
-/**
- * Sets the focus to a new target, handling the roving tabindex for the last one
- * @param {Element} target
- * @param {Element} previousTarget
- */
-function setFocus(target, previousTarget) {
-  // Refresh focusgroup memory
-  setRovingTabindex(previousTarget);
-  resetRovingTabindex(target);
-  target.focus();
 }
 
 /**

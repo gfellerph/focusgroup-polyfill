@@ -17,7 +17,16 @@ document
   });
 
 // JIT options
-// const jitFocusgroup = document.getElementById('jit-focusgroup');
-// document.getElementById('jit-vertical').addEventListener('change', () => {
-//   jitFocusgroup.setAttribute('focusgroup', jitFocusgroup.getAttribute('focusgroup').split(' ').)
-// })
+const jitFocusgroup = document.getElementById("jit-focusgroup");
+document.querySelectorAll(".jit-toggle").forEach((toggle) => {
+  toggle.addEventListener("change", (e) => {
+    let options = jitFocusgroup.getAttribute("focusgroup");
+    const optionToToggle = e.target.name;
+    if (options.includes(optionToToggle)) {
+      options = options.replace(optionToToggle, "");
+    } else {
+      options += ` ${optionToToggle}`;
+    }
+    jitFocusgroup.setAttribute("focusgroup", options.trim());
+  });
+});

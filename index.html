@@ -407,22 +407,25 @@
       <button>Button 2</button>
       <button>Button 3</button>
     </div>
-    <ul aria-label="errors in this example">
-      <li>
-        If the memory element gets removed, the roving tabindex on the other
-        elements is not being reset
-      </li>
-    </ul>
 
     <h2>Just in time options</h2>
-    <fieldset>
+    <fieldset focusgroup="wrap">
       <legend>Focusgroup options</legend>
-      <input type="checkbox" name="vertical" id="jit-vertical" />
-      <label for="jit-vertical">Vertical</label>
-      <input type="checkbox" name="horizontal" id="jit-horizontal" />
-      <label for="jit-horizontal">Horizontal</label>
-      <input type="checkbox" name="wrap" id="jit-wrap" />
+      <input class="jit-toggle" type="checkbox" name="block" id="jit-block" />
+      <label for="jit-block">Block</label>
+      <input class="jit-toggle" type="checkbox" name="inline" id="jit-inline" />
+      <label for="jit-inline">Inline</label>
+      <input class="jit-toggle" type="checkbox" name="wrap" id="jit-wrap" />
       <label for="jit-wrap">Wrap</label>
+      <input
+        class="jit-toggle"
+        type="checkbox"
+        name="no-memory"
+        id="jit-no-memory"
+      />
+      <label for="jit-no-memory">No memory</label>
+      <input class="jit-toggle" type="checkbox" name="none" id="jit-none" />
+      <label for="jit-none">None</label>
     </fieldset>
     <div focusgroup id="jit-focusgroup">
       <button>Button 1</button>

@@ -71,6 +71,7 @@ export const candidateReasons = {
  */
 export const isFocusgroupCandidate = (element) => {
   const focusgroup = getParentFocusgroup(element);
+  const options = getOptions(focusgroup);
 
   // Check if element is part of a focusgroup
   if (!focusgroup)
@@ -81,7 +82,7 @@ export const isFocusgroupCandidate = (element) => {
     };
 
   // Check if the focusgroup options is not none
-  if (focusgroup.getAttribute("focusgroup") === "none")
+  if (options.none)
     return {
       isCandidate: false,
       reason: candidateReasons.FOCUSGROUP_NONE,
@@ -128,6 +129,51 @@ const isFocusable = (element) => {
 export const rovingFocusgroups = new WeakMap();
 
 /**
+ * Handle changes within the focusgroup and initialize
+ * @param {MutationRecord[]} records
+ * @param {MutationObserver} observer
+ */
+const rovingChildHandler = (records) => {
+  for (const record of records) {
+    for (const addedNode of record.addedNodes) {
+      if (isFocusgroupCandidate(addedNode)) {
+        setRovingTabindex(addedNode);
+      }
+    }
+    for (const removedNode of record.removedNodes) {
+      if (
+        isFocusable(removedNode) &&
+        !removedNode.matches(keyConflictSelector) &&
+        !removedNode.hasAttribute("tabindex")
+      ) {
+        disableRovingTabindex(record.target);
+      }
+    }
+  }
+};
+const rovingChildObserver = new MutationObserver(rovingChildHandler);
+const rovingChildObserverOptions = {
+  childList: true,
+  subtree: true,
+};
+
+const optionChangedHandler = (records) => {
+  for (const record of records) {
+    if (record.type === "attributes" && record.attributeName === "focusgroup") {
+      const options = getOptions(record.target);
+      if (options.nomemory || options.none) {
+        disableRovingTabindex(record.target);
+      }
+    }
+  }
+};
+const optionChangeObserver = new MutationObserver(optionChangedHandler);
+const optionChangeObserverOptions = {
+  attributes: true,
+  attributeFilter: ["focusgroup"],
+};
+
+/**
  * Initializes roving behavior. Only call this if you know
  * that one of the elements has focus.
  * @param {Element} element
@@ -136,14 +182,12 @@ export const rovingFocusgroups = new WeakMap();
 export const initializeRovingTabindex = (element) => {
   if (rovingFocusgroups.has(element)) return;
 
-  // TODO: add mutation observer for child events and initialize new candidates with tabindex=-1
-  // TODO: add mutation observer for focusgroup attribute no-memory to disable roving tabindex
+  // Add mutation observer for child events and initialize new candidates with tabindex=-1
+  rovingChildObserver.observe(element, rovingChildObserverOptions);
+  // Add mutation observer for focusgroup attribute no-memory to disable roving tabindex
+  optionChangeObserver.observe(element, optionChangeObserverOptions);
 
   const candidates = findCandidates(element);
-  const focusedCandidate = candidates.filter((candidate) =>
-    candidate.matches(":focus")
-  );
-  if (!focusedCandidate) return;
   candidates.map((candidate) => {
     if (candidate.matches(":focus")) {
       // This element should be focusable by tabstop
