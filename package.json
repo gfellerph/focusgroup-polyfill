@@ -4,7 +4,8 @@
   "description": "Partial polyfill for the focusgroup attribute (https://open-ui.org/components/focusgroup.explainer/).",
   "keywords": [
     "focusgroup",
-    "polyfill"
+    "polyfill",
+    "openui"
   ],
   "author": "Philipp Gfeller <philipp.gfeller@post.ch>",
   "license": "Apache-2.0",
@@ -14,8 +15,8 @@
     "dist"
   ],
   "scripts": {
+    "start": "http-server",
     "build": "esbuild main.js --bundle --minify --outfile='dist/main.js'",
-    "serve": "http-server",
     "test": "playwright test",
     "testui": "playwright test --ui"
   },
