@@ -1,6 +1,6 @@
 {
   "name": "@gfellerph/focusgroup-polyfill",
-  "version": "0.0.1-experimental.0",
+  "version": "0.0.1-experimental.1",
   "description": "Partial polyfill for the focusgroup attribute (https://open-ui.org/components/focusgroup.explainer/).",
   "keywords": [
     "focusgroup",
