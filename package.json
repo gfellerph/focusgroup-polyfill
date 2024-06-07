@@ -1,5 +1,5 @@
 {
-  "name": "focusgroup",
+  "name": "@gfellerph/focusgroup-polyfill",
   "version": "0.0.1-experimental.0",
   "description": "Partial polyfill for the focusgroup attribute (https://open-ui.org/components/focusgroup.explainer/).",
   "keywords": [
@@ -14,6 +14,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "start": "http-server",
     "build": "esbuild main.js --bundle --minify --outfile='dist/main.js'",
