@@ -1,18 +1,26 @@
 {
   "name": "@gfellerph/focusgroup-polyfill",
-  "version": "0.0.1-experimental.3",
+  "version": "0.0.1-experimental.4",
   "description": "Partial polyfill for the focusgroup attribute (https://open-ui.org/components/focusgroup.explainer/).",
+  "author": "Philipp Gfeller <philipp.gfeller@post.ch>",
+  "license": "MIT",
   "keywords": [
     "focusgroup",
     "polyfill",
     "openui"
   ],
-  "author": "Philipp Gfeller <philipp.gfeller@post.ch>",
-  "license": "MIT",
+  "homepage": "https://gfellerph.github.io/focusgroup-polyfill/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gfellerph/focusgroup-polyfill"
+  },
+  "bugs": {
+    "url": "https://github.com/gfellerph/focusgroup-polyfill/issues"
+  },
+  "type": "module",
   "browser": "main.js",
   "jsdelivr": "cdn.js",
   "unpkg": "cdn.js",
-  "type": "module",
   "files": [
     "main.js",
     "src",
