@@ -1,6 +1,6 @@
 {
   "name": "@gfellerph/focusgroup-polyfill",
-  "version": "0.0.1-experimental.2",
+  "version": "0.0.1-experimental.3",
   "description": "Partial polyfill for the focusgroup attribute (https://open-ui.org/components/focusgroup.explainer/).",
   "keywords": [
     "focusgroup",
@@ -8,20 +8,25 @@
     "openui"
   ],
   "author": "Philipp Gfeller <philipp.gfeller@post.ch>",
-  "license": "Apache-2.0",
-  "main": "dist/main.js",
+  "license": "MIT",
+  "browser": "main.js",
+  "jsdelivr": "cdn.js",
+  "unpkg": "cdn.js",
   "type": "module",
   "files": [
-    "dist"
+    "main.js",
+    "src",
+    "cdn.js"
   ],
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
     "start": "http-server",
-    "build": "esbuild main.js --bundle --minify --outfile=dist/main.js",
+    "build": "esbuild main.js --bundle --minify --outfile=cdn.js",
     "test": "playwright test",
-    "testui": "playwright test --ui"
+    "testui": "playwright test --ui",
+    "prepublish": "pnpm build"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.1",
