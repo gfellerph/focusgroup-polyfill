@@ -1,18 +1,22 @@
+import { getChildren } from "focusgroup/src/shadow-tree-walker.js";
+
 import {
-  getChildren,
-  getOptions,
   getDirectionMap,
-  isFocusgroupCandidate,
+  getOptions,
   candidateReasons,
-  rovingFocusgroups,
-  disableRovingTabindex,
-  initializeRovingTabindex,
-  setRovingTabindex,
-  resetRovingTabindex,
+  isFocusgroupCandidate,
+  getParentFocusgroup,
   findNextCandidate,
   DIRECTION,
-  getParentFocusgroup,
-} from "./src/shadow-tree-walker.js";
+} from "focusgroup/src/focusgroup-core.js";
+
+import {
+  setRovingTabindex,
+  resetRovingTabindex,
+  initializeRovingTabindex,
+  disableRovingTabindex,
+  rovingFocusgroups,
+} from "focusgroup/src/roving-tabindex.js";
 
 // A map for keeping track of observed root nodes
 const observedRoots = new WeakMap();
