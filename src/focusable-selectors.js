@@ -1,7 +1,7 @@
 // Adapted from Kitty Giraudel:
 // https://github.com/KittyGiraudel/focusable-selectors/blob/main/index.js
 
-export const focusableSelector = `:where(${[
+const focusableElementsSelector = [
   "button",
   'input:not([type="hidden"])',
   "[tabindex]",
@@ -14,9 +14,9 @@ export const focusableSelector = `:where(${[
   `video[controls]`,
   `area[href]`,
   "details > summary:first-of-type",
-].join(",")})`;
+].join(",");
 
-export const focusDisablingParentSelecor = `:where(${[
+export const focusDisablingSelector = [
   "[inert]",
   "[inert] *",
   ":disabled",
@@ -24,7 +24,11 @@ export const focusDisablingParentSelecor = `:where(${[
   "[popover]:not(:popover-open) *",
   "details:not([open]) > *:not(details > summary:first-of-type)",
   "details:not([open]) > *:not(details > summary:first-of-type) *",
-].join(",")})`;
+].join(",");
+
+export const focusableSelector = `:where(${focusableElementsSelector})`;
+
+export const focusDisablingParentSelecor = `:where(${focusDisablingSelector})`;
 
 // These elements already use arrow keys for navigation, tab should be used to exit
 export const keyConflictSelector = [

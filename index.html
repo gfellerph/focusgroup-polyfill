@@ -5,19 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Focusgroup</title>
     <link rel="stylesheet" href="style.css" />
-    <script type="module" src="main.ts"></script>
-    <script type="module" src="custom-attribute-polyfill.ts"></script>
+    <script type="module" src="main.js"></script>
     <script type="module" src="demo.js"></script>
   </head>
   <body>
-    <div>
-      <button id="add-attribute">add attribute</button>
-      <button id="edit-attribute">edit attribute</button>
-      <button id="remove-attribute">remove attribute</button>
-      <button id="clone-div">clone this div</button>
-      <button id="test-attribute">testing attributes</button>
-    </div>
-    <h1 custom-attribute>Testing focusgroups</h1>
+    <h1>Testing focusgroups</h1>
     <p>
       This is a test page for a focusgroup implementation that works across
       shadow dom boundaries according to the
@@ -35,7 +27,6 @@
       <a href="#">Link 3</a>
       I'm just some text
       <button>Button 4</button>
-      <button focusgroup="none">Button with focusgroup=none</button>
       <button disabled tabindex="0">not today</button>
       <span tabindex="0">I'm focusable</span>
       -
