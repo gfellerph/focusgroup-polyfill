@@ -1,8 +1,10 @@
 import {
-  focusDisablingParentSelecor,
-  focusableSelector,
   keyConflictSelector,
-} from "./focusable-selectors.js";
+  isFocusable
+} from "./focusable.js";
+import {
+  isFocusgroup
+} from "./utils.js";
 
 /**
  * Option type for focusgroups
@@ -28,15 +30,6 @@ export const DIRECTION = {
   PREVIOUS: 1,
   FIRST: 2,
   LAST: 3,
-};
-
-/**
- * Check if the element is a focusgroup
- * @param {Element} element
- * @returns {boolean}
- */
-const isFocusgroup = (element) => {
-  return element.hasAttribute("focusgroup");
 };
 
 /**
@@ -71,8 +64,7 @@ export const candidateReasons = {
  */
 export const isFocusgroupCandidate = (element) => {
   const focusgroup = getParentFocusgroup(element);
-  const options = getOptions(focusgroup);
-
+  
   // Check if element is part of a focusgroup
   if (!focusgroup)
     return {
@@ -82,6 +74,7 @@ export const isFocusgroupCandidate = (element) => {
     };
 
   // Check if the focusgroup options is not none
+  const options = getOptions(focusgroup);
   if (options.none)
     return {
       isCandidate: false,
@@ -111,136 +104,6 @@ export const isFocusgroupCandidate = (element) => {
     reason: candidateReasons.IS_CANDIDATE,
     focusgroup,
   };
-};
-
-/**
- * Check if an element is currently focusable
- * @param {Element} element
- * @returns {boolean}
- */
-const isFocusable = (element) => {
-  return (
-    !element.matches(focusDisablingParentSelecor) &&
-    element.matches(focusableSelector)
-  );
-};
-
-// Holds a list of initialized roving tabindex focusgroups
-export const rovingFocusgroups = new WeakMap();
-
-/**
- * Handle changes within the focusgroup and initialize
- * @param {MutationRecord[]} records
- * @param {MutationObserver} observer
- */
-const rovingChildHandler = (records) => {
-  for (const record of records) {
-    for (const addedNode of record.addedNodes) {
-      if (isFocusgroupCandidate(addedNode)) {
-        setRovingTabindex(addedNode);
-      }
-    }
-    for (const removedNode of record.removedNodes) {
-      if (
-        isFocusable(removedNode) &&
-        !removedNode.matches(keyConflictSelector) &&
-        !removedNode.hasAttribute("tabindex")
-      ) {
-        disableRovingTabindex(record.target);
-      }
-    }
-  }
-};
-const rovingChildObserver = new MutationObserver(rovingChildHandler);
-const rovingChildObserverOptions = {
-  childList: true,
-  subtree: true,
-};
-
-const optionChangedHandler = (records) => {
-  for (const record of records) {
-    if (record.type === "attributes" && record.attributeName === "focusgroup") {
-      const options = getOptions(record.target);
-      if (options.nomemory || options.none) {
-        disableRovingTabindex(record.target);
-      }
-    }
-  }
-};
-const optionChangeObserver = new MutationObserver(optionChangedHandler);
-const optionChangeObserverOptions = {
-  attributes: true,
-  attributeFilter: ["focusgroup"],
-};
-
-/**
- * Initializes roving behavior. Only call this if you know
- * that one of the elements has focus.
- * @param {Element} element
- * @returns
- */
-export const initializeRovingTabindex = (element) => {
-  if (rovingFocusgroups.has(element)) return;
-
-  // Add mutation observer for child events and initialize new candidates with tabindex=-1
-  rovingChildObserver.observe(element, rovingChildObserverOptions);
-  // Add mutation observer for focusgroup attribute no-memory to disable roving tabindex
-  optionChangeObserver.observe(element, optionChangeObserverOptions);
-
-  const candidates = findCandidates(element);
-  candidates.map((candidate) => {
-    if (candidate.matches(":focus")) {
-      // This element should be focusable by tabstop
-      resetRovingTabindex(candidate);
-    } else {
-      setRovingTabindex(candidate);
-    }
-  });
-  rovingFocusgroups.set(element, true);
-};
-
-/**
- * Uses tabindex to create a roving tabindex behavior. If the
- * element previously had a tabindex set, it will be memorized
- * in a custom attribute and restored if focusgroup functionality
- * is being reset.
- * @param {Element} element
- */
-export const setRovingTabindex = (element) => {
-  const currentTabindex = element.getAttribute("tabindex");
-  element.setAttribute("tabindex", "-1");
-  if (currentTabindex) {
-    element.setAttribute("data-focusgroup-tabindex-memory", currentTabindex);
-  }
-};
-
-/**
- * Reset the roving tabindex behaviour. If the element previously
- * had a tabindex set, it's restored to its previous value.
- * @param {Element} element
- */
-export const resetRovingTabindex = (element) => {
-  const tabindexMemory = element.getAttribute(
-    "data-focusgroup-tabindex-memory"
-  );
-  if (tabindexMemory) {
-    element.setAttribute("tabindex", tabindexMemory);
-  } else {
-    element.removeAttribute("tabindex");
-  }
-};
-
-/**
- * Removes roving tabindex behavior from a focusgroup
- * @param {Element} element
- */
-export const disableRovingTabindex = (element) => {
-  if (rovingFocusgroups.has(element)) {
-    rovingFocusgroups.delete(element);
-  }
-  findCandidates(element).map((candidate) => {
-    resetRovingTabindex(candidate);
-  });
 };
 
 /**
@@ -289,19 +152,6 @@ const getParent = (element) => {
   }
 
   return parentNode;
-};
-
-/**
- * Returns the first child, including slotted elements
- * @param {Element} element
- * @returns {Element | null}
- */
-const getFirstChild = (element) => {
-  const children = getChildren(element);
-  if (children?.length > 0) {
-    return children[0];
-  }
-  return null;
 };
 
 /**
@@ -440,26 +290,3 @@ export const findNextCandidate = (
   return candidate;
 };
 
-/**
- * Get a list of candidates participating in this focusgroup
- * @param {Element} element Starting node, should be a focusgroup but does not have to
- * @param {number} index Index for keeping track of recurse
- * @returns {Element[]} A list of candidates of this focusgroup
- */
-export const findCandidates = (element, index = 0) => {
-  // Exit criteria 1: element is a focusgroup, either the parent or a focusgroup=none
-  if (index > 0 && isFocusgroup(element)) {
-    return [];
-  }
-
-  let candidates = [];
-  const children = Array.from(getChildren(element));
-  children.map((childnode) => {
-    if (isFocusable(childnode)) {
-      candidates.push(childnode);
-    }
-    candidates = [...candidates, ...findCandidates(childnode, index + 1)];
-  });
-
-  return candidates;
-};

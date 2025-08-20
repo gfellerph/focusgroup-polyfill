@@ -16,7 +16,7 @@ const focusableElementsSelector = [
   "details > summary:first-of-type",
 ].join(",");
 
-export const focusDisablingSelector = [
+const focusDisablingSelector = [
   "[inert]",
   "[inert] *",
   ":disabled",
@@ -26,9 +26,9 @@ export const focusDisablingSelector = [
   "details:not([open]) > *:not(details > summary:first-of-type) *",
 ].join(",");
 
-export const focusableSelector = `:where(${focusableElementsSelector})`;
+const focusableSelector = `:where(${focusableElementsSelector})`;
 
-export const focusDisablingParentSelecor = `:where(${focusDisablingSelector})`;
+const focusDisablingParentSelecor = `:where(${focusDisablingSelector})`;
 
 // These elements already use arrow keys for navigation, tab should be used to exit
 export const keyConflictSelector = [
@@ -40,3 +40,15 @@ export const keyConflictSelector = [
   "video",
   "iframe",
 ].join(",");
+
+/**
+ * Check if an element is currently focusable
+ * @param {Element} element
+ * @returns {boolean}
+ */
+export function isFocusable(element) {
+  return (
+    !element.matches(focusDisablingParentSelecor) &&
+    element.matches(focusableSelector)
+  );
+};
