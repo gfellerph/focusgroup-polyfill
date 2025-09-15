@@ -164,7 +164,7 @@ class FocusgroupAttribute extends Attribute {
 
   connectedCallback() {
     if (this.hasRovingTabIndex) {
-      initializeRovingTabindex(this.host);
+      initializeRovingTabindex(this.host, isNoneFocusgroup);
     }
   }
 
@@ -172,7 +172,7 @@ class FocusgroupAttribute extends Attribute {
     this.#options = getOptions(newValue);
 
     if (this.hasRovingTabIndex) {
-      initializeRovingTabindex(this.host);
+      initializeRovingTabindex(this.host, isNoneFocusgroup);
     } else {
       disableRovingTabindex(this.element);
     }
@@ -181,4 +181,9 @@ class FocusgroupAttribute extends Attribute {
   disconnectedCallback() {
     disableRovingTabindex(this.host);
   }
+}
+
+function isNoneFocusgroup(element) {
+  const options = getOptions(element);
+  return options.none;
 }

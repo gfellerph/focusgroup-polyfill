@@ -295,14 +295,14 @@ export const findNextCandidate = (
 export function shadowQuerySelector(
   root,
   filter = () => true,
-  boundary = () => false
+  boundary = () => true
 ) {
   let candidates = [];
 
   if (filter(root)) candidates.push(root);
 
   for (const child of getChildren(root)) {
-    if (boundary(child)) continue;
+    if (!boundary(child)) continue;
     const result = shadowQuerySelector(child, filter, boundary);
     candidates = candidates.concat(result);
   }
