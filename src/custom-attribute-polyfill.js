@@ -33,6 +33,14 @@ export class Attribute {
   }
 
   /**
+   * Get the name of the attribute.
+   * @returns {string}
+   */
+  get name() {
+    return this.#name;
+  }
+
+  /**
    * Get the value of the attribute.
    * @returns {string | null}
    */
@@ -77,7 +85,7 @@ export class Attribute {
 
 /**
  * @template T
- * @typedef {new (...args: any[]) => T} CustomAttribute
+ * @typedef {new (...args: any[]) => T} Attribute
  */
 
 const validAttributeNames = new RegExp(/^(?:[A-Z_]|-[A-Z-_])[A-Z0-9_-]*$/i);
@@ -85,7 +93,7 @@ const validAttributeNames = new RegExp(/^(?:[A-Z_]|-[A-Z-_])[A-Z0-9_-]*$/i);
 /**
  * Register a custom attribute on a given root element.
  * @param {string} name - The name of the attribute.
- * @param {CustomAttribute} customAttribute - The custom attribute class.
+ * @param {Attribute} customAttribute - The custom attribute class.
  * @param {Document | DocumentFragment | Element} root - The root element to observe.
  * @param {boolean} deep - Whether to observe child elements.
  * @returns {void}
@@ -103,7 +111,7 @@ export function registerAttribute(
     return;
   }
 
-  if (!(customAttribute instanceof CustomAttribute)) {
+  if (!(customAttribute.prototype instanceof Attribute)) {
     console.error(
       `Failed to execute 'registerAttribute': the customAttribute is not a valid CustomAttribute instance.`
     );
@@ -212,7 +220,12 @@ export function registerAttribute(
   }
 
   // Start listening to changes
-  observer.observe(root, { ...observerConfig, attributeFilter, childList: deep, subtree: deep });
+  observer.observe(root, {
+    ...observerConfig,
+    attributeFilter,
+    childList: deep,
+    subtree: deep,
+  });
 
   // Initial pass
   if (deep) {

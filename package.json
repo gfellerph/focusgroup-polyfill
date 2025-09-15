@@ -37,9 +37,8 @@
     "prepublish": "pnpm build"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.1",
-    "@types/node": "^20.14.1",
-    "esbuild": "^0.20.0",
+    "@playwright/test": "^1.55.0",
+    "esbuild": "^0.25.9",
     "http-server": "^14.1.1"
   }
 }
