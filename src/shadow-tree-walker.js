@@ -1,10 +1,5 @@
-import {
-  keyConflictSelector,
-  isFocusable
-} from "./focusable.js";
-import {
-  isFocusgroup
-} from "./utils.js";
+import { keyConflictSelector, isFocusable } from "./focusable.js";
+import { isFocusgroup } from "./utils.js";
 
 /**
  * Option type for focusgroups
@@ -64,7 +59,7 @@ export const candidateReasons = {
  */
 export const isFocusgroupCandidate = (element) => {
   const focusgroup = getParentFocusgroup(element);
-  
+
   // Check if element is part of a focusgroup
   if (!focusgroup)
     return {
@@ -290,3 +285,27 @@ export const findNextCandidate = (
   return candidate;
 };
 
+/**
+ * Recursively queries a shadow DOM tree for elements matching a filter
+ * @param {Element} root
+ * @param {Function} filter
+ * @param {Function} boundary
+ * @returns {Element[]}
+ */
+export function shadowQuerySelector(
+  root,
+  filter = () => true,
+  boundary = () => false
+) {
+  let candidates = [];
+
+  if (filter(root)) candidates.push(root);
+
+  for (const child of getChildren(root)) {
+    if (boundary(child)) continue;
+    const result = shadowQuerySelector(child, filter, boundary);
+    candidates = candidates.concat(result);
+  }
+
+  return candidates;
+}

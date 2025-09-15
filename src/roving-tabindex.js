@@ -1,50 +1,60 @@
 import { isFocusable } from "./focusable.js";
-import { isFocusgroup } from "./utils.js";
-import { getChildren } from "./shadow-tree-walker.js";
+import { shadowQuerySelector } from "./shadow-tree-walker.js";
 
-const TABINDEX_MEMORY = "data-focusgroup-tabindex-memory";
+const TABINDEX_MEMORY = "data-roving-tabindex-memory";
+const ROVING_INDICATOR = "data-roving-tabindex";
 
 // Holds a list of initialized roving tabindex focusgroups
 const rovingFocusgroups = new WeakMap();
 
-/**
- * Initializes roving behavior. Only call this if you know
- * that one of the elements has focus.
- * @param {Element} element
- * @returns
- */
-export const initializeRovingTabindex = (element) => {
+export function initializeRovingTabindex(element, boundary) {
+  // Check if already initialised
   if (rovingFocusgroups.has(element)) return;
 
-  // Add mutation observer for child events and initialize new candidates with tabindex=-1
+  // Handle subtree changes
   rovingChildObserver.observe(element, rovingChildObserverOptions);
-  // Add mutation observer for focusgroup attribute no-memory to disable roving tabindex
-  optionChangeObserver.observe(element, optionChangeObserverOptions);
 
-  const candidates = findCandidates(element);
-  candidates.map((candidate) => {
+  // Keep a reference to prevent double initialisation
+  rovingFocusgroups.set(element, boundary);
+
+  // Walk the subtree to find focusable elements and initialise them
+  const candidates = shadowQuerySelector(element, isFocusable, boundary);
+  for (const candidate of candidates) {
+    candidate.setAttribute(ROVING_INDICATOR, "");
     if (candidate.matches(":focus")) {
       // This element should be focusable by tabstop
       resetRovingTabindex(candidate);
     } else {
       setRovingTabindex(candidate);
     }
-  });
-  rovingFocusgroups.set(element, true);
-};
+  }
+}
+
+/**
+ * Check if an element has been initialised with roving tabindex
+ * @param {Element} element
+ * @returns {boolean}
+ */
+function isRover(element) {
+  return element.hasAttribute(ROVING_INDICATOR);
+}
 
 /**
  * Removes roving tabindex behavior from a focusgroup
  * @param {Element} element
  */
-export const disableRovingTabindex = (element) => {
-  if (rovingFocusgroups.has(element)) {
-    rovingFocusgroups.delete(element);
-  }
-  element.querySelectorAll(`[${TABINDEX_MEMORY}]`).forEach((candidate) => {
+export function disableRovingTabindex(element) {
+  if (!rovingFocusgroups.has(element)) return;
+
+  let boundary = rovingFocusgroups.get(element);
+
+  const candidates = shadowQuerySelector(element, isRover, boundary);
+  for (const candidate of candidates) {
     resetRovingTabindex(candidate);
-  });
-};
+  }
+
+  rovingFocusgroups.delete(element);
+}
 
 /**
  * Uses tabindex to create a roving tabindex behavior. If the
@@ -53,36 +63,33 @@ export const disableRovingTabindex = (element) => {
  * is being reset.
  * @param {Element} element
  */
-export const setRovingTabindex = (element) => {
+export function setRovingTabindex(element) {
   const currentTabindex = element.getAttribute("tabindex");
   if (currentTabindex) {
     element.setAttribute(TABINDEX_MEMORY, currentTabindex);
   }
   element.setAttribute("tabindex", "-1");
-};
+}
 
 /**
  * Reset the roving tabindex behaviour. If the element previously
  * had a tabindex set, it's restored to its previous value.
  * @param {Element} element
  */
-export const resetRovingTabindex = (element) => {
-  const oldTabIndex = element.getAttribute(
-    TABINDEX_MEMORY
-  );
+export function resetRovingTabindex(element) {
+  const oldTabIndex = element.getAttribute(TABINDEX_MEMORY);
   if (oldTabIndex) {
     element.setAttribute("tabindex", oldTabIndex);
   } else {
     element.removeAttribute("tabindex");
   }
-};
+}
 
 /**
  * Handle changes within the focusgroup and initialize
  * @param {MutationRecord[]} records
- * @param {MutationObserver} observer
  */
-const rovingChildHandler = (records) => {
+function rovingChildHandler(records) {
   for (const record of records) {
     for (const addedNode of record.addedNodes) {
       if (isFocusgroupCandidate(addedNode)) {
@@ -99,50 +106,9 @@ const rovingChildHandler = (records) => {
       }
     }
   }
-};
+}
 const rovingChildObserver = new MutationObserver(rovingChildHandler);
 const rovingChildObserverOptions = {
   childList: true,
   subtree: true,
-};
-
-const optionChangedHandler = (records) => {
-  for (const record of records) {
-    if (record.type === "attributes" && record.attributeName === "focusgroup") {
-      const options = getOptions(record.target);
-      if (options.nomemory || options.none) {
-        disableRovingTabindex(record.target);
-      }
-    }
-  }
-};
-const optionChangeObserver = new MutationObserver(optionChangedHandler);
-const optionChangeObserverOptions = {
-  attributes: true,
-  attributeFilter: ["focusgroup"],
-};
-
-
-/**
- * Get a list of candidates participating in this focusgroup
- * @param {Element} element Starting node, should be a focusgroup but does not have to be
- * @param {boolean} _initialRun Index for keeping track of recurse
- * @returns {Element[]} A list of candidates of this focusgroup
- */
-export const findCandidates = (element, _initialRun = true) => {
-  // Exit criteria 1: element is a focusgroup, either the parent or a focusgroup=none
-  if (!_initialRun && isFocusgroup(element)) {
-    return [];
-  }
-
-  let candidates = [];
-  const children = Array.from(getChildren(element));
-  children.map((childnode) => {
-    if (isFocusable(childnode)) {
-      candidates.push(childnode);
-    }
-    candidates = [...candidates, ...findCandidates(childnode, false)];
-  });
-
-  return candidates;
 };

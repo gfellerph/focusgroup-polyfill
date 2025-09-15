@@ -9,14 +9,19 @@ import {
   getParentFocusgroup,
 } from "./shadow-tree-walker.js";
 
-import { setRovingTabindex, 
-  disableRovingTabindex, 
-  initializeRovingTabindex, 
-  resetRovingTabindex } from "./roving-tabindex.js";
+import {
+  setRovingTabindex,
+  disableRovingTabindex,
+  initializeRovingTabindex,
+  resetRovingTabindex,
+} from "./roving-tabindex.js";
+
+import { Attribute, registerAttribute } from "./custom-attribute-polyfill.js";
 
 // A map for keeping track of observed root nodes
 const observedRoots = new WeakMap();
-export const focusGroupSupported = "focusgroup" in document.createElement("div");
+export const focusGroupSupported =
+  "focusgroup" in document.createElement("div");
 
 /**
  * Add a focusin listener to a root element to enable focusgroup behaviour on that element and
@@ -35,35 +40,27 @@ export default function registerFocusGroupPolyfill(root = window) {
  * @param {Event} event
  * @returns {Element}
  */
-export const getActiveElement = (event) => {
+function getActiveElement(event) {
   let root = event.target.shadowRoot;
-  let keepGoing = root != null;
-  if (keepGoing) {
-    // Oh boy, it's a shadow root, dig as deep as necessary to find the actual
-    // target
-    while (keepGoing) {
-      if (root.activeElement.shadowRoot != null) {
-        root = root.activeElement.shadowRoot;
-      } else {
-        keepGoing = false;
-      }
-    }
 
+  // Oh boy, it's a shadow root, dig as deep as necessary to find the actual target
+  while (root) {
     // Continuous focus-in events are not fired from the same shadow root, a dedicated listener has to be set for each root
     registerFocusGroupPolyfill(root);
-
-    return root.activeElement;
-  } else {
-    // It's the light dom, the target is the actually focused element
-    return event.target;
+    root = root.activeElement.shadowRoot;
   }
-};
+
+  return root && root.activeElement ? root.activeElement : event.target;
+}
+
+let i = 0;
 
 /**
  * Focus-in event handler
  * @param {FocusEvent} focusEvent
  */
 function focusInHandler(focusEvent) {
+  console.log("focusInHandler", i++, focusEvent);
   // Find the real focused element, even if it's nested in a shadow-root
   const activeElement = getActiveElement(focusEvent);
 
@@ -73,13 +70,7 @@ function focusInHandler(focusEvent) {
 
   // If it is, start to handle keydown events
   if (isCandidate) {
-    // TODO: is there a way around calling stop propagation here?
-    // If any other listeners are set on the page, it destroys their functionality
-    focusEvent.stopPropagation();
-    const options = getOptions(focusgroup);
-    if (!options.nomemory) {
-      initializeRovingTabindex(focusgroup);
-    }
+    registerAttribute("focusgroup", FocusgroupAttribute, focusgroup, false);
 
     // Check if there are parent focusgroups and disable roving tabindex on them
     let currentParentFocusgroup = getParentFocusgroup(focusgroup);
@@ -98,9 +89,7 @@ function focusInHandler(focusEvent) {
       () => activeElement.removeEventListener("keydown", keydownHandler),
       { once: true }
     );
-  } else if (
-    reason === candidateReasons.KEY_CONFLICT
-  ) {
+  } else if (reason === candidateReasons.KEY_CONFLICT) {
     // Focus is on a key conflict field, disable roving behavior
     disableRovingTabindex(focusgroup);
   }
@@ -158,5 +147,38 @@ function focusNode(activeElement, activeFocusGroup, options, direction, event) {
       resetRovingTabindex(nodeToFocus);
     }
     nodeToFocus.focus();
+  }
+}
+
+class FocusgroupAttribute extends Attribute {
+  #options;
+
+  constructor(name, element) {
+    super(name, element);
+    this.#options = getOptions(element);
+  }
+
+  get hasRovingTabIndex() {
+    return !this.#options.none && !this.#options.nomemory;
+  }
+
+  connectedCallback() {
+    if (this.hasRovingTabIndex) {
+      initializeRovingTabindex(this.host);
+    }
+  }
+
+  changedCallback(newValue) {
+    this.#options = getOptions(newValue);
+
+    if (this.hasRovingTabIndex) {
+      initializeRovingTabindex(this.host);
+    } else {
+      disableRovingTabindex(this.element);
+    }
+  }
+
+  disconnectedCallback() {
+    disableRovingTabindex(this.host);
   }
 }
