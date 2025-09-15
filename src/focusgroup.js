@@ -1,27 +1,24 @@
-import {
-  getChildren,
-  getOptions,
-  getDirectionMap,
-  isFocusgroupCandidate,
-  candidateReasons,
-  findNextCandidate,
-  DIRECTION,
-  getParentFocusgroup,
-} from "./shadow-tree-walker.js";
-
+import { shadowQuerySelector } from "./shadow-tree-walker.js";
 import {
   setRovingTabindex,
   disableRovingTabindex,
   initializeRovingTabindex,
   resetRovingTabindex,
 } from "./roving-tabindex.js";
-
 import { Attribute, registerAttribute } from "./custom-attribute-polyfill.js";
+import {
+  isFocusgroup,
+  getFocusgroupOptions,
+  getParentFocusgroup,
+  getDirectionMap,
+  isFocusgroupCandidate,
+  DIRECTION,
+  focusGroupSupported,
+} from "./utils.js";
+import { isFocusable } from "./focusable.js";
 
 // A map for keeping track of observed root nodes
 const observedRoots = new WeakMap();
-export const focusGroupSupported =
-  "focusgroup" in document.createElement("div");
 
 /**
  * Add a focusin listener to a root element to enable focusgroup behaviour on that element and
@@ -53,23 +50,20 @@ function getActiveElement(event) {
   return root && root.activeElement ? root.activeElement : event.target;
 }
 
-let i = 0;
-
 /**
  * Focus-in event handler
  * @param {FocusEvent} focusEvent
  */
 function focusInHandler(focusEvent) {
-  console.log("focusInHandler", i++, focusEvent);
   // Find the real focused element, even if it's nested in a shadow-root
   const activeElement = getActiveElement(focusEvent);
 
   // Check if target is a candidate
-  const { isCandidate, reason, focusgroup } =
-    isFocusgroupCandidate(activeElement);
+  const isCandidate = isFocusgroupCandidate(activeElement);
 
   // If it is, start to handle keydown events
   if (isCandidate) {
+    const focusgroup = getParentFocusgroup(activeElement);
     registerAttribute("focusgroup", FocusgroupAttribute, focusgroup, false);
 
     // Check if there are parent focusgroups and disable roving tabindex on them
@@ -89,9 +83,9 @@ function focusInHandler(focusEvent) {
       () => activeElement.removeEventListener("keydown", keydownHandler),
       { once: true }
     );
-  } else if (reason === candidateReasons.KEY_CONFLICT) {
-    // Focus is on a key conflict field, disable roving behavior
-    disableRovingTabindex(focusgroup);
+  } else {
+    // Focus is on a non-candidate, disable roving tabindex on the parent focusgroup, if any
+    disableRovingTabindex(getParentFocusgroup(activeElement));
   }
 }
 
@@ -107,7 +101,7 @@ function handleKeydown(event, focusTarget, focusGroup) {
   if (event.defaultPrevented) return;
 
   const key = `${event.getModifierState("Meta") ? "Meta" : ""}${event.key}`;
-  const options = getOptions(focusGroup);
+  const options = getFocusgroupOptions(focusGroup);
   const keyMap = getDirectionMap(focusTarget, options);
 
   if (key in keyMap) {
@@ -124,21 +118,42 @@ function handleKeydown(event, focusTarget, focusGroup) {
  * @param {KeyboardEvent} event The event that fired
  */
 function focusNode(activeElement, activeFocusGroup, options, direction, event) {
-  // Switch start node if meta key is pressed to enable jumping to first/last
-  const startNode =
-    direction === DIRECTION.NEXT || direction === DIRECTION.PREVIOUS
-      ? activeElement
-      : activeFocusGroup;
-  const forward = direction === DIRECTION.FIRST || direction === DIRECTION.NEXT;
-  let nodeToFocus = findNextCandidate(startNode, forward);
+  const candidates = shadowQuerySelector(
+    activeFocusGroup,
+    isFocusable,
+    isFocusgroup
+  );
 
-  // Handle wrapping behaviour
-  if (nodeToFocus == null && options.wrap) {
-    const children = getChildren(activeFocusGroup);
-    const startingNode = forward ? children[0] : children[children.length - 1];
-    nodeToFocus = findNextCandidate(startingNode, forward, true, false, 1);
+  // Take no action, there are no candidates in this focusgroup
+  if (candidates.length === 0) return;
+
+  const currentIndex = candidates.indexOf(activeElement);
+
+  // Default if no current index is found
+  let nextIndex = -1;
+  if (currentIndex === -1) {
+    // Current focus is not in this focusgroup, focus the first element
+    nextIndex = 0;
+  } else if (direction === DIRECTION.NEXT) {
+    nextIndex = currentIndex + 1;
+
+    // Handle wrapping behaviour
+    if (nextIndex >= candidates.length) nextIndex = options.wrap ? 0 : -1;
+  } else if (direction === DIRECTION.PREVIOUS) {
+    nextIndex = currentIndex - 1;
+
+    // Handle wrapping behaviour
+    if (nextIndex < 0) nextIndex = options.wrap ? candidates.length - 1 : -1;
+  } else if (direction === DIRECTION.FIRST) {
+    nextIndex = 0;
+  } else if (direction === DIRECTION.LAST) {
+    nextIndex = candidates.length - 1;
   }
 
+  // No next index found, do nothing
+  if (nextIndex === -1) return;
+
+  const nodeToFocus = candidates[nextIndex];
   if (nodeToFocus) {
     // Key event is handled by the focusgroup, prevent other default events
     event.preventDefault();
@@ -146,6 +161,8 @@ function focusNode(activeElement, activeFocusGroup, options, direction, event) {
       setRovingTabindex(activeElement);
       resetRovingTabindex(nodeToFocus);
     }
+
+    // Oh my, finally something to focus
     nodeToFocus.focus();
   }
 }
@@ -155,7 +172,7 @@ class FocusgroupAttribute extends Attribute {
 
   constructor(name, element) {
     super(name, element);
-    this.#options = getOptions(element);
+    this.#options = getFocusgroupOptions(element);
   }
 
   get hasRovingTabIndex() {
@@ -164,15 +181,15 @@ class FocusgroupAttribute extends Attribute {
 
   connectedCallback() {
     if (this.hasRovingTabIndex) {
-      initializeRovingTabindex(this.host, isNoneFocusgroup);
+      initializeRovingTabindex(this.host, isFocusgroup);
     }
   }
 
   changedCallback(newValue) {
-    this.#options = getOptions(newValue);
+    this.#options = getFocusgroupOptions(newValue);
 
     if (this.hasRovingTabIndex) {
-      initializeRovingTabindex(this.host, isNoneFocusgroup);
+      initializeRovingTabindex(this.host, isFocusgroup);
     } else {
       disableRovingTabindex(this.element);
     }
@@ -181,9 +198,4 @@ class FocusgroupAttribute extends Attribute {
   disconnectedCallback() {
     disableRovingTabindex(this.host);
   }
-}
-
-function isNoneFocusgroup(element) {
-  const options = getOptions(element);
-  return options.none;
 }

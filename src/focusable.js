@@ -51,4 +51,4 @@ export function isFocusable(element) {
     !element.matches(focusDisablingParentSelecor) &&
     element.matches(focusableSelector)
   );
-};
+}
