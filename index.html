@@ -22,12 +22,7 @@
     <h2>Regular focusgroup</h2>
     <div focusgroup>
       <button id="regular-focusgroup-button-1">Button 1</button>
-      <input
-        focusgroup
-        type="text"
-        name="testinput"
-        id="regular-focusgroup-textinput"
-      />
+      <input type="text" name="testinput" id="regular-focusgroup-textinput" />
       <button id="regular-focusgroup-button-2">Button 2</button>
       <a href="#">Link 3</a>
       I'm just some text
@@ -262,7 +257,7 @@
           <slot name="bla"></slot>
         </div>
       </template>
-      <button slot="bla">Shadow button 1</button>
+      <button slot="bla">NOT PART OF FOCUSGROUP</button>
       <button>Shadow button 2</button>
       <button>Shadow button 3</button>
       <button>Shadow button 4</button>

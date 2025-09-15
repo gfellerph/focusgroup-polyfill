@@ -39,15 +39,17 @@ export default function registerFocusGroupPolyfill(root = window) {
  */
 function getActiveElement(event) {
   let root = event.target.shadowRoot;
+  let eventTarget = event.target;
 
   // Oh boy, it's a shadow root, dig as deep as necessary to find the actual target
   while (root) {
     // Continuous focus-in events are not fired from the same shadow root, a dedicated listener has to be set for each root
     registerFocusGroupPolyfill(root);
+    eventTarget = root.activeElement || eventTarget;
     root = root.activeElement.shadowRoot;
   }
 
-  return root && root.activeElement ? root.activeElement : event.target;
+  return eventTarget;
 }
 
 /**
