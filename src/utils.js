@@ -1,5 +1,5 @@
 import { keyConflictSelector, isFocusable } from "./focusable.js";
-import { getParent } from "./shadow-tree-walker.js";
+import { getParent } from "./shadow-tree-walker/shadow-tree-walker.js";
 
 /**
  * Option type for focusgroups

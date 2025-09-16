@@ -1,5 +1,5 @@
 import { isFocusable } from "./focusable.js";
-import { shadowQuerySelector } from "./shadow-tree-walker.js";
+import { shadowQuerySelector } from "./shadow-tree-walker/shadow-tree-walker.js";
 
 const TABINDEX_MEMORY = "data-roving-tabindex-memory";
 const ROVING_INDICATOR = "data-roving-tabindex";

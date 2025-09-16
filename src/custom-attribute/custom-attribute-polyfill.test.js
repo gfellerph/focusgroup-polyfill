@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/src/custom-attribute-polyfill.test.html");
+  await page.goto("/src/custom-attribute/custom-attribute-polyfill.test.html");
   await page.evaluate(async () => {
     const { Attribute, registerAttribute } = await import(
       "./custom-attribute-polyfill.js"

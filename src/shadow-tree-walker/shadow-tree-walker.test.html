@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script type="module" src="./shadow-tree-walker.js"></script>
+  </head>
+  <body>
+    <!-- Shadow DOM test setup -->
+    <div id="shadow-host"></div>
+    <div id="slot-host">
+      <span id="slotted-element" slot="my-slot">Slotted Content</span>
+    </div>
+    <script>
+      // Create a shadow root with children
+      const shadowHost = document.getElementById("shadow-host");
+      const shadowRoot = shadowHost.attachShadow({ mode: "open" });
+      const shadowChild = document.createElement("div");
+      shadowChild.id = "shadow-child";
+      shadowChild.textContent = "Shadow Child";
+      shadowRoot.appendChild(shadowChild);
+
+      // Create a shadow root with a slot
+      const slotHost = document.getElementById("slot-host");
+      const slotRoot = slotHost.attachShadow({ mode: "open" });
+      const slot = document.createElement("slot");
+      slot.name = "my-slot";
+      slotRoot.appendChild(slot);
+
+      // Deeply nested shadow DOM
+      const deepHost = document.createElement("div");
+      deepHost.id = "deep-host";
+      document.body.appendChild(deepHost);
+      const deepShadow1 = deepHost.attachShadow({ mode: "open" });
+      const deepChild1 = document.createElement("div");
+      deepChild1.id = "deep-child-1";
+      deepShadow1.appendChild(deepChild1);
+      // Nest another shadow root inside deepChild1
+      const deepHost2 = document.createElement("div");
+      deepHost2.id = "deep-host-2";
+      deepChild1.appendChild(deepHost2);
+      const deepShadow2 = deepHost2.attachShadow({ mode: "open" });
+      const deepChild2 = document.createElement("div");
+      deepChild2.id = "deep-child-2";
+      deepShadow2.appendChild(deepChild2);
+    </script>
+  </body>
+</html>

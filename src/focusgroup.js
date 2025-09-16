@@ -1,11 +1,14 @@
-import { shadowQuerySelector } from "./shadow-tree-walker.js";
+import { shadowQuerySelector } from "./shadow-tree-walker/shadow-tree-walker.js";
 import {
   setRovingTabindex,
   disableRovingTabindex,
   initializeRovingTabindex,
   resetRovingTabindex,
 } from "./roving-tabindex.js";
-import { Attribute, registerAttribute } from "./custom-attribute-polyfill.js";
+import {
+  Attribute,
+  registerAttribute,
+} from "./custom-attribute/custom-attribute-polyfill.js";
 import {
   isFocusgroup,
   getFocusgroupOptions,
