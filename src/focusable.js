@@ -36,8 +36,9 @@ export const keyConflictSelector = [
   "select",
   "textarea",
   "[contenteditable]",
-  "audio",
-  "video",
+  "audio[controls]",
+  "video[controls]",
+  "object",
   "iframe",
 ].join(",");
 

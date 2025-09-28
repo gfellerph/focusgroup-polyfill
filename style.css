@@ -1,3 +1,379 @@
+/* Neo-Brutalist Skeleton Content Styles */
+/* Neo-Brutalist Skeleton Content Styles (Neutral) */
+.neo-skeleton-content {
+  margin-bottom: 2rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  background: white;
+  border: 4px solid var(--primary-foreground);
+  border-top-width: 0;
+  border-bottom-left-radius: 1.2rem;
+  border-bottom-right-radius: 1.2rem;
+  box-shadow: 4px 4px 0 var(--primary-foreground);
+}
+.neo-skeleton {
+  background: #e0e0e0;
+  border: 2px solid #d1d1d1;
+  border-radius: 1.2rem;
+  min-height: 1.5rem;
+  width: 100%;
+}
+.neo-skeleton--title {
+  min-height: 2.5rem;
+  width: 60%;
+  margin-bottom: 0.5rem;
+}
+.neo-skeleton--subtitle {
+  min-height: 1.5rem;
+  width: 40%;
+  margin-bottom: 0.5rem;
+}
+.neo-skeleton--bar {
+  min-height: 1.2rem;
+  width: 100%;
+}
+.neo-skeleton--bar.short {
+  width: 60%;
+}
+.neo-skeleton-cards {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.neo-skeleton-card {
+  background: #fafafa;
+  border: 2px solid #d1d1d1;
+  border-radius: 1.2rem;
+  padding: 1.2rem 1rem 1rem 1rem;
+  flex: 1 1 0;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.neo-skeleton--card-title {
+  min-height: 1.5rem;
+  width: 70%;
+  margin-bottom: 0.3rem;
+}
+.neo-skeleton--card-bar {
+  min-height: 1rem;
+  width: 100%;
+}
+.neo-skeleton--card-bar.short {
+  width: 60%;
+}
+/* Neo-Brutalist Navigation Example Styles */
+.neo-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--primary-background);
+  border: 4px solid var(--primary-foreground);
+  border-top-left-radius: 1.2rem;
+  border-top-right-radius: 1.2rem;
+  box-shadow: 4px 4px 0 var(--primary-foreground);
+  padding: 1rem 2rem;
+  margin-top: 1rem;
+  gap: 2rem;
+}
+.neo-nav__logo {
+  display: block;
+
+  svg {
+    display: block;
+  }
+}
+.neo-nav__links {
+  display: flex;
+  gap: 1.2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.neo-nav__link {
+  display: block;
+  background: #fff;
+  color: var(--primary-foreground);
+  border: 2.5px solid var(--primary-foreground);
+  border-radius: 0.7em;
+  padding: 0.5em 1.2em;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.neo-nav__link:hover,
+.neo-nav__link:focus {
+  box-shadow: 4px 4px 0 var(--primary-foreground);
+}
+@media (max-width: 700px) {
+  .neo-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .neo-nav__links {
+    flex-wrap: wrap;
+  }
+}
+/* WYSIWYG Toolbar Neo-Brutalist Styles */
+.wysiwyg-toolbar {
+  display: flex;
+  gap: 1rem;
+  border: 4px solid #181818;
+  border-bottom-width: 0;
+  border-top-left-radius: 1.2rem;
+  border-top-right-radius: 1.2rem;
+  padding: 1rem 1.5rem;
+  align-items: center;
+  justify-content: flex-start;
+  box-shadow: 4px 4px 0 #181818;
+  position: relative;
+
+  &:has(:focus-visible) {
+    &::after {
+      box-sizing: border-box;
+      content: "You can use arrow keys to navigate the toolbar";
+      position: absolute;
+      width: 100%;
+      top: auto;
+      left: 0;
+      bottom: -1em;
+      padding: 0.25em 1em;
+      line-height: 1;
+      background: #181818;
+      color: #fff;
+    }
+  }
+}
+.wysiwyg-btn {
+  background: var(--primary-background);
+  color: var(--primary-foreground);
+  border: 3px solid var(--primary-foreground);
+  border-radius: 0.5em;
+  box-shadow: 0 0 0 #181818;
+  font-size: 1.3rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  display: block;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+}
+.wysiwyg-btn:hover,
+.wysiwyg-btn:focus {
+  background: #fff200;
+  color: #181818;
+  border-color: #181818;
+  box-shadow: 4px 4px 0 #181818;
+}
+.wysiwyg-btn svg {
+  display: block;
+}
+.wysiwyg-editor {
+  min-height: 120px;
+  background: #fff;
+  border: 4px solid #181818;
+  border-bottom-left-radius: 1.2rem;
+  border-bottom-right-radius: 1.2rem;
+  box-shadow: 4px 4px 0 #181818;
+  padding: 1.2rem 1.5rem;
+  font-size: 1.2rem;
+  font-family: inherit;
+  color: #181818;
+  outline: none;
+  margin-bottom: 2rem;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+/* Bauhaus-inspired Neo-Brutalist Startup Page Styles */
+html {
+  --default-background: #ebeadc;
+  --primary-background: #fff200;
+  --primary-foreground: #181818;
+  --accent-foreground: #0048ff;
+  --secondary-background: white;
+}
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", "Futura", "Arial", sans-serif;
+  background: var(--default-background);
+  color: var(--primary-foreground);
+}
+
+:where(h1, h2, h3, h4, h5, h6, :headings) {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+.container {
+  max-width: 900px;
+  margin-inline: auto;
+  padding: 0 2rem;
+}
+
+.hero {
+  background: var(--primary-background);
+  color: var(--primary-foreground);
+  padding-block: 3rem 2rem;
+  border-bottom: 1rem solid var(--primary-foreground);
+}
+
+.hero h1 {
+  font-size: 4rem;
+  font-weight: 900;
+  margin: 0 0 1rem 0;
+  text-decoration: underline;
+  text-decoration-color: var(--secondary-background);
+  text-decoration-skip-ink: none;
+  text-underline-offset: -8px;
+  text-decoration-thickness: 24px;
+}
+.hero p {
+  max-width: 55ch;
+  font-size: 1.3rem;
+}
+.hero--intro {
+  display: flex;
+}
+.button {
+  display: inline-block;
+  padding: 0.75em 2em;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: 3px solid var(--primary-foreground);
+  color: var(--primary-foreground);
+  text-decoration: none;
+  border-radius: 0.5em;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+
+  &:focus-visible {
+    outline: 4px solid var(--accent-foreground);
+    border-color: var(--secondary-background);
+  }
+}
+.button--cta {
+  color: var(--primary-foreground);
+  border-color: var(--primary-background);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-foreground);
+  text-decoration-thickness: 4px;
+  padding-inline: 0;
+}
+
+.install-command {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--primary-foreground);
+  color: var(--primary-background);
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+
+  .code-string {
+    color: var(--secondary-background);
+  }
+
+  pre {
+    margin: 0;
+  }
+}
+
+.button--copy {
+  appearance: none;
+  background: transparent;
+  border-color: transparent;
+  color: white;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+section {
+  margin: 3rem auto 0 auto;
+  padding: 2rem;
+}
+
+section h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0 0 2rem 0;
+  color: var(--primary-foreground);
+}
+
+.feature-list {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.card {
+  background: var(--primary-background);
+  color: var(--primary-foreground);
+  border: 3px solid var(--primary-foreground);
+  border-radius: 1.5rem;
+  box-shadow: 4px 4px 0 var(--primary-foreground);
+  padding: 2rem 1.5rem;
+  flex: 1 1 0;
+  margin-bottom: 2rem;
+  position: relative;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+
+.card h3 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin: 0 0 1rem 0;
+}
+.card p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+kbd {
+  display: inline-block;
+  background: var(--primary-foreground);
+  color: var(--secondary-background);
+  border-radius: 0.3em;
+  padding: 0.1em 0.5em;
+  font-size: 1em;
+  font-family: inherit;
+  margin: 2px;
+  border: 2px solid var(--primary-foreground);
+}
+
+@media (max-width: 900px) {
+  .feature-list {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  section {
+    padding: 1rem;
+  }
+}
 *::part(shadow) {
   display: inline-block;
   padding: 0.5rem;
@@ -10,7 +386,7 @@
   background-color: white;
 }
 
-[focusgroup]:not([focusgroup~="none"]):has(:focus-visible) {
+/* [focusgroup]:not([focusgroup~="none"]):has(:focus-visible) {
   position: relative;
   outline: 2px solid grey;
 
@@ -36,7 +412,7 @@
       content: "↔ Arrow keys enabled";
     }
   }
-}
+} */
 
 [focusgroup~="block"] {
   display: flex;
@@ -55,4 +431,13 @@
 
 fieldset {
   margin-block: 1em;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap; /* added line */
 }

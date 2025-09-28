@@ -1,0 +1,58 @@
+*::part(shadow) {
+  display: inline-block;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.22);
+}
+
+*::part(slot) {
+  display: inline-block;
+  padding: 0.5rem;
+  background-color: white;
+}
+
+[focusgroup]:not([focusgroup~="none"]):has(:focus-visible) {
+  position: relative;
+  outline: 2px solid grey;
+
+  &::before {
+    content: "↔ and ↕ Arrow keys enabled";
+    position: absolute;
+    top: 100%;
+    color: white;
+    background-color: grey;
+    padding: 0.125em 0.25em;
+    font-size: 0.8em;
+    direction: ltr;
+  }
+
+  &[focusgroup~="block"] {
+    &::before {
+      content: "↕ Arrow keys enabled";
+    }
+  }
+
+  &[focusgroup~="inline"] {
+    &::before {
+      content: "↔ Arrow keys enabled";
+    }
+  }
+}
+
+[focusgroup~="block"] {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.navigation {
+  display: flex;
+  gap: 1rem;
+}
+
+#dom-interference-container:not(:has(button))::before {
+  content: "Click the buttons above to add more buttons.";
+}
+
+fieldset {
+  margin-block: 1em;
+}

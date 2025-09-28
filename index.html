@@ -3,548 +3,243 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Focusgroup</title>
+    <title>Focusgroup Polyfill</title>
     <link rel="stylesheet" href="style.css" />
     <script type="module" src="main.js"></script>
     <script type="module" src="demo.js"></script>
   </head>
   <body>
-    <h1>Testing focusgroups</h1>
-    <p>
-      This is a test page for a focusgroup implementation that works across
-      shadow dom boundaries according to the
-      <a href="https://open-ui.org/components/focusgroup.explainer/"
-        >non active Open UI focusgroup explainer</a
-      >.
-    </p>
-    <button>First focus</button>
+    <header class="hero">
+      <div class="container">
+        <h1>focusgroup</h1>
+        <p>
+          Focusgroup simplifies focus management for UI elements like toolbars
+          and navigations by offering keyboard navigation with arrow keys,
+          reducing tab stops in the document. Focusgroup ensures consistency and
+          accessibility across devices and input methods.
+        </p>
+        <p>
+          <a
+            class="button button--cta"
+            href="https://open-ui.org/components/scoped-focusgroup.explainer/"
+            >Read the Open UI explainer
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              fill="currentColor"
+              version="1.1"
+              id="Capa_1"
+              viewBox="0 0 97.283 97.283"
+              xml:space="preserve"
+              aria-hidden="true"
+              style="width: 1.5em; height: 1.5em; vertical-align: middle"
+            >
+              <g>
+                <path
+                  d="M62.805,83.951l33.894-33.896c0.78-0.781,0.78-2.047,0-2.828L62.805,13.332c-0.781-0.781-2.047-0.781-2.828,0l-9.031,9.03   c-0.375,0.375-0.586,0.883-0.586,1.414c0,0.53,0.211,1.039,0.586,1.414l14.531,14.534H2c-1.104,0-2,0.896-2,2v13.835   c0,1.104,0.896,2,2,2h63.479L50.945,72.091c-0.75,0.75-0.75,2.078,0,2.828l9.031,9.031c0.375,0.375,0.883,0.586,1.414,0.586   C61.92,84.537,62.43,84.326,62.805,83.951z"
+                />
+              </g>
+            </svg>
+          </a>
+        </p>
+      </div>
+    </header>
 
-    <h2>Regular focusgroup</h2>
-    <div focusgroup>
-      <button id="regular-focusgroup-button-1">Button 1</button>
-      <input type="text" name="testinput" id="regular-focusgroup-textinput" />
-      <button id="regular-focusgroup-button-2">Button 2</button>
-      <a href="#">Link 3</a>
-      I'm just some text
-      <button>Button 4</button>
-      <button disabled tabindex="0">not today</button>
-      <span tabindex="0">I'm focusable</span>
-      -
-      <span tabindex="-1">I'm focusable too, but only throught JS</span>
-      <button id="regular-focusgroup-button-5">Button 6</button>
-    </div>
+    <section class="container">
+      <h2>Use focusgroup today</h2>
+      <p>
+        Install the polyfill and enhance your UI controls without waiting for
+        browser support.
+      </p>
 
-    <ul>
-      <li>TODO: a disabled button with tabindex is a focus trap</li>
-    </ul>
-
-    <h2>RTL focusgroup</h2>
-    <div dir="rtl" focusgroup>
-      <button id="rtl-focusgroup-button-1">Button 1</button>
-      <button id="rtl-focusgroup-button-2">Button 2</button>
-      <button>Button 3</button>
-      <button>Button 4</button>
-      <button id="rtl-focusgroup-button-5">Button 5</button>
-    </div>
-
-    <h2>Horizontal focusgroup</h2>
-    <div focusgroup="inline">
-      <button id="horizontal-focusgroup-button-1">Button 1</button>
-      <button id="horizontal-focusgroup-button-2">Button 2</button>
-      <button>Button 3</button>
-      <button>Button 4</button>
-      <button id="horizontal-focusgroup-button-5">Button 5</button>
-    </div>
-
-    <h2>Vertical focusgroup</h2>
-    <div class="vertical" focusgroup="block">
-      <button id="vertical-focusgroup-button-1">Button 1</button>
-      <button id="vertical-focusgroup-button-2">Button 2</button>
-      <button>Button 3</button>
-      <button>Button 4</button>
-      <button id="vertical-focusgroup-button-5">Button 5</button>
-    </div>
-
-    <h2>Wrong usage of horizontal and vertical focusgroup</h2>
-    <div focusgroup="inline block">
-      <button id="wrong-hv-focusgroup-button-1">Button 1</button>
-      <button id="wrong-hv-focusgroup-button-2">Button 2</button>
-      <button>Button 3</button>
-      <button>Button 4</button>
-      <button id="wrong-hv-focusgroup-button-5">Button 5</button>
-    </div>
-
-    <h2>Simple horizontal with extending vertical focusgroups</h2>
-    <div focusgroup="inline">
-      <button id="horizontal-extending-vertical-button-1">
-        Horizontal button 1
-      </button>
-      <button id="horizontal-extending-vertical-button-2">
-        Horizontal button 2
-      </button>
-      <button id="horizontal-extending-vertical-button-3">
-        Horizontal button 3
-      </button>
-      <div class="vertical" focusgroup="block">
-        <button id="horizontal-extending-vertical-button-3-1">
-          Vertical button 3.1
-        </button>
-        <button id="horizontal-extending-vertical-button-3-2">
-          Vertical button 3.2
-        </button>
-        <button id="horizontal-extending-vertical-button-3-3">
-          Vertical button 3.3
+      <div class="install-command">
+        <pre><code aria-describedby="install-command-description">npm i <span class="code-string">@gfellerph/focusgroup-polyfill</span></code></pre>
+        <button class="button button--copy" aria-label="Copy" title="Copy">
+          <!-- Copy Icon SVG -->
+          <svg
+            id="copy-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              xmlns="http://www.w3.org/2000/svg"
+              d="M17.5 14H19C20.1046 14 21 13.1046 21 12V5C21 3.89543 20.1046 3 19 3H12C10.8954 3 10 3.89543 10 5V6.5M5 10H12C13.1046 10 14 10.8954 14 12V19C14 20.1046 13.1046 21 12 21H5C3.89543 21 3 20.1046 3 19V12C3 10.8954 3.89543 10 5 10Z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </button>
       </div>
-      <button id="horizontal-extending-vertical-button-4">
-        Horizontal button 4
-      </button>
-      <button id="horizontal-extending-vertical-button-5">
-        Horizontal button 5
-      </button>
-    </div>
 
-    <h2>Simple vertical with extending horizontal focusgroup</h2>
-    <div focusgroup="block">
-      <button>Vertical button 1</button>
-      <button>Vertical button 2</button>
-      <button>Vertical button 3</button>
-      <div focusgroup="inline">
-        <button>Horizontal button 3.1</button>
-        <button>Horizontal button 3.2</button>
-        <button>Horizontal button 3.3</button>
-      </div>
-      <button>Vertical button 4</button>
-      <button>Vertical button 5</button>
-    </div>
+      <p
+        style="color: gray; margin-block-start: 0.33rem; font-size: 0.9rem"
+        id="install-command-description"
+      >
+        <i>3KB minified and gzipped.</i>
+      </p>
+    </section>
 
-    <h2>Simple all block nested focusgroups</h2>
-    <div focusgroup>
-      <div focusgroup="block">
-        <button>Extending button 1</button>
-      </div>
-      <div focusgroup="block">
-        <button>Extending button 2</button>
-      </div>
-      <div focusgroup="block">
-        <button>Extending button 3</button>
-      </div>
-      <div focusgroup="block">
-        <button>Extending button 4</button>
-      </div>
-      <div focusgroup="block">
-        <button>Extending button 5</button>
-      </div>
-    </div>
-
-    <h2 id="vertical-nested">Vertical nested in horizontal</h2>
-    <div class="navigation" focusgroup>
-      <div>
-        <button id="vertical-nested-button-1">Button 1</button>
-        <div focusgroup="block">
-          <a href="#" id="vertical-nested-h-g1-button-1">Nav item 1</a>
-          <a href="#" id="vertical-nested-h-g1-button-2">Nav item 2</a>
-          <a href="#">Nav item 3</a>
-          <a href="#">Nav item 4</a>
-          <a href="#">Nav item 5</a>
+    <section class="container">
+      <h2>Features</h2>
+      <div class="feature-list">
+        <div class="card">
+          <h3>Keyboard navigation</h3>
+          <p>
+            Enables focus movement with <kbd>Up <span aria-hidden>↑</span></kbd
+            >, <kbd>Down <span aria-hidden>↓</span></kbd
+            >, <kbd>Left <span aria-hidden>←</span></kbd> and
+            <kbd>Right <span aria-hidden>→</span></kbd> arrow keys as well as
+            <kbd>Home</kbd> and <kbd>End</kbd>.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Roving tabindex</h3>
+          <p>
+            Allows skipping over groups of related controls with just one
+            <kbd>tab <span aria-hidden>⇥</span></kbd>
+            keypress, reducing the amount of tab stops in the document.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Shadow DOM support</h3>
+          <p>
+            Support for Shadow DOM allows focusgroups to work across shadow root
+            boundaries.
+          </p>
         </div>
       </div>
-      <div>
-        <button id="vertical-nested-button-2">Button 2</button>
-        <div focusgroup="block">
-          <a href="#" id="vertical-nested-h-g2-button-1">Nav item 1</a>
-          <a href="#">Nav item 2</a>
-          <a href="#">Nav item 3</a>
-          <a href="#">Nav item 4</a>
-          <a href="#">Nav item 5</a>
-        </div>
-      </div>
-      <div>
-        <button>Button 3</button>
-        <div focusgroup="block">
-          <a href="#">Nav item 1</a>
-          <a href="#">Nav item 2</a>
-          <a href="#">Nav item 3</a>
-          <a href="#">Nav item 4</a>
-          <a href="#">Nav item 5</a>
-        </div>
-      </div>
-    </div>
+    </section>
 
-    <h2 id="wrapping-focusgroup">Wrapping focusgroup</h2>
-    <div focusgroup="wrap">
-      <button id="wrapping-focusgroup-button-1">Button 1</button>
-      <button id="wrapping-focusgroup-button-2">Button 2</button>
-      <button id="wrapping-focusgroup-button-3">Button 3</button>
-      <button id="wrapping-focusgroup-button-4">Button 4</button>
-      <button id="wrapping-focusgroup-button-5">Button 5</button>
-    </div>
-
-    <h2 id="shadow-dom-focusgroup">Shadow Dom focusgroup</h2>
-    <div>
-      <template shadowrootmode="open">
-        <link rel="stylesheet" href="style.css" />
-        <div focusgroup part="shadow">
-          <button id="shadow-dom-focusgroup-button-1">Shadow button 1</button>
-          <button id="shadow-dom-focusgroup-button-2">Shadow button 2</button>
-          <button id="shadow-dom-focusgroup-button-3">Shadow button 3</button>
-          <button id="shadow-dom-focusgroup-button-4">Shadow button 4</button>
-          <button id="shadow-dom-focusgroup-button-5">Shadow button 5</button>
-        </div>
-      </template>
-    </div>
-
-    <h2>Nested shadow DOM focusgroup</h2>
-    <div>
-      <template shadowrootmode="open">
-        <link rel="stylesheet" href="style.css" />
-        <div focusgroup part="shadow">
-          <button>Shadow button 1</button>
-          <span>
-            <template shadowrootmode="open">
-              <link rel="stylesheet" href="style.css" />
-              <span part="shadow">
-                <button>Shadow button 2</button>
-                <span>
-                  <template shadowrootmode="open">
-                    <link rel="stylesheet" href="style.css" />
-                    <span part="shadow">
-                      <button>Shadow button 3</button>
-                      <span>
-                        <template shadowrootmode="open">
-                          <link rel="stylesheet" href="style.css" />
-                          <span part="shadow">
-                            <button>Shadow button 4</button>
-                            <span>
-                              <template shadowrootmode="open">
-                                <link rel="stylesheet" href="style.css" />
-                                <span part="shadow">
-                                  <button>Shadow button 5</button>
-                                </span>
-                              </template>
-                            </span>
-                          </span>
-                        </template>
-                      </span>
-                    </span>
-                  </template>
-                </span>
-              </span>
-            </template>
-          </span>
-        </div>
-      </template>
-    </div>
-
-    <h2>Light dom focusgroup with shadow dom items</h2>
-    <div focusgroup part="shadow">
-      <template shadowrootmode="open">
-        <link rel="stylesheet" href="style.css" />
-        <button>Shadow button 1</button>
-        <button>Shadow button 2</button>
-        <button>Shadow button 3</button>
-        <button>Shadow button 4</button>
-        <button>Shadow button 5</button>
-      </template>
-    </div>
-
-    <h2>Focusgroup in shadow dom with slotted items</h2>
-    <div>
-      <template shadowrootmode="open">
-        <link rel="stylesheet" href="style.css" />
-        <div part="shadow">
-          <slot focusgroup> </slot>
-          <slot name="bla"></slot>
-        </div>
-      </template>
-      <button slot="bla">NOT PART OF FOCUSGROUP</button>
-      <button>Shadow button 2</button>
-      <button>Shadow button 3</button>
-      <button>Shadow button 4</button>
-      <button>Shadow button 5</button>
-    </div>
-
-    <ul aria-label="errors in the above example">
-      <li>
-        Shadow button 1 not reachable correctly and behaving weird if focused
-      </li>
-    </ul>
-
-    <h2>Mixed light dom, shadow dom and slotted</h2>
-    <p>Complicated use-case</p>
-    <div focusgroup>
-      <button id="mixed-dom-button-1">1</button>
-      <button id="mixed-dom-button-2">2</button>
-      <span>
-        <template shadowrootmode="open">
-          <link rel="stylesheet" href="style.css" />
-          <span part="shadow">
-            <button id="mixed-dom-button-3">3</button>
-            <button id="mixed-dom-button-4">4</button>
-            <span part="slot">
-              <slot></slot>
-            </span>
-            <button id="mixed-dom-button-7">7</button>
-            <button id="mixed-dom-button-8">8</button>
-          </span>
-        </template>
-        <button id="mixed-dom-button-5">5</button>
-        <button id="mixed-dom-button-6">6</button>
-      </span>
-    </div>
-
-    <h2>Nested focusgroup</h2>
-    <div focusgroup>
-      <button>Button 1</button>
-      <button>Button 2</button>
-      <button>Button 3</button>
-      <div>
-        <button>Nested Button 1</button>
-        <button>Nested Button 2</button>
-        <button>Nested Button 3</button>
-        <button>Nested Button 4</button>
-        <button>Nested Button 5</button>
-      </div>
-      <button>Button 4</button>
-      <button>Button 5</button>
-    </div>
-
-    <h2>Nested shadow focusgroup</h2>
-    <div focusgroup>
-      <button>Button 1</button>
-      <button>Button 2</button>
-      <button>Button 3</button>
-      <div>
-        <template shadowrootmode="open">
-          <link rel="stylesheet" href="style.css" />
-          <div part="shadow">
-            <button>Nested Button 1</button>
-            <button>Nested Button 2</button>
-            <button>Nested Button 3</button>
-            <button>Nested Button 4</button>
-            <button>Nested Button 5</button>
+    <section class="container">
+      <h2>Navigation example</h2>
+      <nav class="neo-nav" role="navigation" aria-label="Main Navigation">
+        <a class="neo-nav__logo" href="#">
+          <span class="visually-hidden">Back to homepage</span>
+          <svg
+            width="36"
+            height="36"
+            viewBox="0 0 36 36"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <rect
+              x="2"
+              y="2"
+              width="32"
+              height="32"
+              rx="8"
+              fill="#fff200"
+              stroke="#181818"
+              stroke-width="3"
+            />
+            <circle cx="18" cy="18" r="7" fill="#181818" />
+          </svg>
+        </a>
+        <ul class="neo-nav__links" focusgroup="inline" role="menubar">
+          <li>
+            <a href="#features" class="neo-nav__link" role="menuitem"
+              >Features</a
+            >
+          </li>
+          <li>
+            <a href="#install" class="neo-nav__link" role="menuitem">Install</a>
+          </li>
+          <li>
+            <a href="#demo" class="neo-nav__link" role="menuitem">Demo</a>
+          </li>
+          <li>
+            <a
+              href="https://github.com/gfellerph/focusgroup-polyfill"
+              class="neo-nav__link"
+              role="menuitem"
+              target="_blank"
+              rel="noopener"
+              >GitHub</a
+            >
+          </li>
+        </ul>
+      </nav>
+      <div class="neo-skeleton-content" aria-hidden="true">
+        <div class="neo-skeleton-cards">
+          <div class="neo-skeleton-card">
+            <div class="neo-skeleton neo-skeleton--card-title"></div>
+            <div class="neo-skeleton neo-skeleton--card-bar"></div>
+            <div class="neo-skeleton neo-skeleton--card-bar short"></div>
           </div>
-        </template>
-      </div>
-    </div>
-
-    <h2>Deeply nested focusgroup</h2>
-    <div focusgroup>
-      <button>Button 1</button>
-      <button>Button 2</button>
-      <button>Button 3</button>
-      <div>
-        <div>
-          <div>
-            <div>
-              <button>Nested Button 1</button>
-              <button>Nested Button 2</button>
-              <button>Nested Button 3</button>
-              <button>Nested Button 4</button>
-              <button>Nested Button 5</button>
-            </div>
+          <div class="neo-skeleton-card">
+            <div class="neo-skeleton neo-skeleton--card-title"></div>
+            <div class="neo-skeleton neo-skeleton--card-bar"></div>
+            <div class="neo-skeleton neo-skeleton--card-bar short"></div>
+          </div>
+          <div class="neo-skeleton-card">
+            <div class="neo-skeleton neo-skeleton--card-title"></div>
+            <div class="neo-skeleton neo-skeleton--card-bar"></div>
+            <div class="neo-skeleton neo-skeleton--card-bar short"></div>
           </div>
         </div>
       </div>
-      <button>Button 4</button>
-      <button>Button 5</button>
-    </div>
+    </section>
 
-    <h2>Weird invalid markup example</h2>
-    <div focusgroup>
-      <button>
-        I'm a button with links 1
-        <span>
-          <a href="http://">Link 1</a>
-          <a href="http://">Link 2</a>
-          <a href="http://">Link 3</a>
-          <a href="http://">Link 4</a>
-          <a href="http://">Link 5</a>
-        </span>
-      </button>
-      <button>
-        I'm a button with links 2
-        <span>
-          <a href="http://">Link 1</a>
-          <a href="http://">Link 2</a>
-          <a href="http://">Link 3</a>
-          <a href="http://">Link 4</a>
-          <a href="http://">Link 5</a>
-        </span>
-      </button>
-      <button>
-        I'm a button with links 3
-        <a href="http://">Link 1</a>
-        <a href="http://">Link 2</a>
-        <a href="http://">Link 3</a>
-        <a href="http://">Link 4</a>
-        <a href="http://">Link 5</a>
-      </button>
-    </div>
-
-    <h2>Focus interference with JS</h2>
-    <button
-      id="js-interference-trigger"
-      onclick="document.getElementById('js-interference-button-2').focus()"
-    >
-      Set focus to Button 2
-    </button>
-    <div focusgroup>
-      <button>Button 1</button>
-      <button id="js-interference-button-2">Button 2</button>
-      <button>Button 3</button>
-      <button>Button 4</button>
-      <button>Button 5</button>
-    </div>
-
-    <h2>Simple dom interference</h2>
-    <button id="dom-interference-add-button">Add button to focusgroup</button>
-    <button id="dom-interference-remove-button">
-      Remove button from focusgroup
-    </button>
-    <div focusgroup id="dom-interference-container">
-      <button>Button 1</button>
-      <button>Button 2</button>
-      <button>Button 3</button>
-    </div>
-
-    <h2>Just in time options</h2>
-    <fieldset focusgroup="wrap">
-      <legend>Focusgroup options</legend>
-      <input class="jit-toggle" type="checkbox" name="block" id="jit-block" />
-      <label for="jit-block">Block</label>
-      <input class="jit-toggle" type="checkbox" name="inline" id="jit-inline" />
-      <label for="jit-inline">Inline</label>
-      <input class="jit-toggle" type="checkbox" name="wrap" id="jit-wrap" />
-      <label for="jit-wrap">Wrap</label>
-      <input
-        class="jit-toggle"
-        type="checkbox"
-        name="no-memory"
-        id="jit-no-memory"
-      />
-      <label for="jit-no-memory">No memory</label>
-      <input class="jit-toggle" type="checkbox" name="none" id="jit-none" />
-      <label for="jit-none">None</label>
-    </fieldset>
-    <div focusgroup id="jit-focusgroup">
-      <button>Button 1</button>
-      <button>Button 2</button>
-      <button>Button 3</button>
-      <button>Button 4</button>
-      <button>Button 5</button>
-    </div>
-
-    <h2>A list of detail summary elements</h2>
-    <div focusgroup="">
-      <details>
-        <summary>Summary</summary>
-        <summary>Summary</summary>
-        <button>just a button here</button>
-      </details>
-      <details>
-        <summary>Summary</summary>
-        <input type="email" />
-      </details>
-      <details>
-        <summary>Summary</summary>
-        <button disabled>I'm disabled</button>
-      </details>
-      <details>
-        <summary>Summary</summary>
-        Details
-      </details>
-    </div>
-
-    <h2>Focusgroup in a popover</h2>
-    <button popovertarget="testpopover">Open popover</button>
-    <div popover id="testpopover" focusgroup>
-      <button autofocus id="testpopover-button-1">Button 1</button>
-      <button id="testpopover-button-2">Button 2</button>
-      <button id="testpopover-button-3">Button 3</button>
-      <button id="testpopover-button-4">Button 4</button>
-    </div>
-
-    <h2>Focusgroup with popover in the middle</h2>
-    <div focusgroup="">
-      <button>Button 1</button>
-      <button popovertarget="middlepopover">Open popover</button>
-      <div popover id="middlepopover">
-        <button id="middlepopover-button-2">Button 2</button>
-        <button id="middlepopover-button-3">Button 3</button>
-        <button id="middlepopover-button-4">Button 4</button>
+    <section class="container">
+      <h2>Toolbar example</h2>
+      <div
+        class="wysiwyg-toolbar"
+        focusgroup="inline"
+        role="toolbar"
+        aria-label="WYSIWYG Toolbar"
+      >
+        <button
+          type="button"
+          class="wysiwyg-btn"
+          aria-label="Bold"
+          title="Bold (Ctrl+B)"
+          data-command="bold"
+        >
+          <b>B</b>
+        </button>
+        <button
+          type="button"
+          class="wysiwyg-btn"
+          aria-label="Italic"
+          title="Italic (Ctrl+I)"
+          data-command="italic"
+        >
+          <i>I</i>
+        </button>
+        <button
+          type="button"
+          class="wysiwyg-btn"
+          aria-label="Underline"
+          title="Underline (Ctrl+U)"
+          data-command="underline"
+        >
+          <u>U</u>
+        </button>
       </div>
-      <button>Button 5</button>
-    </div>
+      <div
+        class="wysiwyg-editor"
+        contenteditable="true"
+        aria-label="WYSIWYG Editor"
+        tabindex="0"
+      >
+        Type here and use the toolbar above to style your text!
+      </div>
 
-    <h2>Focusgroup in a dialog</h2>
-    <button onclick="this.nextElementSibling.showModal()">Open dialog</button>
-    <dialog focusgroup>
-      <button autofocus id="testpopover-button-1">Button 1</button>
-      <button id="testpopover-button-2">Button 2</button>
-      <button id="testpopover-button-3">Button 3</button>
-      <button id="testpopover-button-4">Button 4</button>
-    </dialog>
-
-    <h2>Different focusable elements</h2>
-    <div focusgroup>
-      <button>Button 1</button>
-      <button>Button 2</button>
-      <a href="#">Link 1</a>
-      <input type="text" />
-      <span tabindex="0">Span tabindex</span>
-      <span contenteditable="">Contenteditable</span>
-      <button>Button 3</button>
-      <textarea name="" id="" cols="30" rows="10"></textarea>
-      <button>Button 3</button>
-      <!-- <audio
-        controls
-        src="https://github.com/rafaelreis-hotmart/Audio-Sample-files/raw/master/sample.mp3"
-      ></audio>
-      <button>Button 3</button>
-      <video width="400" controls>
-        <source
-          src="https://www.w3schools.com/html/mov_bbb.mp4"
-          type="video/mp4"
-        />
-        <source
-          src="https://www.w3schools.com/html/mov_bbb.ogg"
-          type="video/ogg"
-        />
-        Your browser does not support HTML video.
-      </video> -->
-      <button>Button 3</button>
-      <details>
-        <summary>Summary</summary>
-        <input type="text" />
-      </details>
-      <button>Button 3</button>
-      <input type="text" />
-      <button>Button 3</button>
-      <select name="" id="">
-        <option value="">Option 1</option>
-        <option value="">Option 2</option>
-        <option value="">Option 3</option>
-        <option value="">Option 4</option>
-      </select>
-      <button>Button 3</button>
-    </div>
-
-    <h2>Not focusgroups</h2>
-    <div>
-      <template shadowrootmode="open">
-        <link rel="stylesheet" href="style.css" />
-        <div part="shadow">
-          <slot></slot>
-        </div>
-      </template>
-      <button>Shadow button 1</button>
-      <button>Shadow button 2</button>
-      <details>
-        <summary>Summary</summary>
-        Details
-      </details>
-    </div>
-    <button>Last focus</button>
+      <pre>
+      <code>
+        &lt;div <strong>focusgroup</strong> role="toolbar"&gt;
+          &lt;button&gt;Bold&lt;/button&gt;
+          &lt;button&gt;Italic&lt;/button&gt;
+          &lt;button&gt;Underline&lt;/button&gt;
+        &lt;/div&gt;
+      </code>
+    </pre>
+    </section>
   </body>
 </html>
