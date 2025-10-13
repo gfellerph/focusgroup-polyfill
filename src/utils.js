@@ -2,17 +2,6 @@ import { keyConflictSelector, isFocusable } from "./focusable.js";
 import { getParent } from "./shadow-tree-walker/shadow-tree-walker.js";
 
 /**
- * Option type for focusgroups
- * @typedef {object} FocusgroupOptions
- * @property {boolean} wrap
- * @property {boolean} inline
- * @property {boolean} block
- * @property {boolean} grid
- * @property {boolean} none
- * @property {boolean} nomemory
- */
-
-/**
  * Direction
  * @typedef {object} DIRECTION
  * @property {number} PREVIOUS
@@ -48,7 +37,7 @@ export function isFocusgroup(element) {
  * @param {Element} element
  * @returns {boolean}
  */
-export const isFocusgroupCandidate = (element) => {
+export function isFocusgroupCandidate(element) {
   const focusgroup = getParentFocusgroup(element);
 
   // Check if element is part of a focusgroup
@@ -66,14 +55,14 @@ export const isFocusgroupCandidate = (element) => {
 
   // All checks passed, this is a candidate
   return true;
-};
+}
 
 /**
  * Find the nearest parent focusgroup
  * @param {Element} element
  * @returns {Element | null}
  */
-export const getParentFocusgroup = (element) => {
+export function getParentFocusgroup(element) {
   let currentElement = getParent(element);
 
   while (currentElement != null) {
@@ -85,7 +74,7 @@ export const getParentFocusgroup = (element) => {
   }
 
   return null;
-};
+}
 
 /**
  * Figure out in which direction to walk the DOM tree
@@ -93,14 +82,13 @@ export const getParentFocusgroup = (element) => {
  * @param {FocusgroupOptions} options Current focusgroup options
  * @returns {object} Direction mappings
  */
-export const getDirectionMap = (element, options) => {
+export function getDirectionMap(element, options) {
   const isLTR = getComputedStyle(element).direction === "ltr";
 
   let keymap = {};
 
   if (options.inline) {
     keymap = {
-      ...keymap,
       ArrowLeft: isLTR ? DIRECTION.PREVIOUS : DIRECTION.NEXT,
       ArrowRight: isLTR ? DIRECTION.NEXT : DIRECTION.PREVIOUS,
       End: DIRECTION.LAST,
@@ -121,29 +109,73 @@ export const getDirectionMap = (element, options) => {
   }
 
   return keymap;
-};
+}
+
+/**
+ * Option type for focusgroups
+ * @typedef {object} FocusgroupOptions
+ * @property {boolean} wrap
+ * @property {boolean} inline
+ * @property {boolean} block
+ * @property {boolean} none
+ * @property {boolean} nomemory
+ * @property {FocusgroupBehavior | null} behavior
+ */
+
+/**
+ * List of supported behaviors
+ * @typedef {object} FocusgroupBehavior
+ * @property {"toolbar" | "tablist" | "radiogroup" | "listbox" | "menu" | "menubar"} behavior
+ */
+const behaviors = [
+  "toolbar",
+  "tablist",
+  "radiogroup",
+  "listbox",
+  "menu",
+  "menubar",
+];
 
 /**
  * Get options of the current focusgroup
  * @param {Element} focusGroup
  * @returns {FocusgroupOptions}
  */
-export const getFocusgroupOptions = (focusGroup) => {
-  const optionsString = ` ${focusGroup.getAttribute("focusgroup").trim()} `;
+export function getFocusgroupOptions(focusGroup) {
+  const rawOptions = focusGroup.getAttribute("focusgroup").trim().toLowerCase();
+  const optionsString = ` ${rawOptions} `;
   const options = {
     block: optionsString.includes(" block "),
     inline: optionsString.includes(" inline "),
     wrap: optionsString.includes(" wrap "),
-    grid: optionsString.includes(" grid "),
     none: optionsString.includes(" none "),
     nomemory: optionsString.includes(" no-memory "),
+    behavior: null,
   };
 
-  // "Both" case
+  // Pattern matching for ARIA roles, first defined wins
+  const earliestMatch = Infinity;
+  let behaviorMatch = null;
+
+  for (const behavior of behaviors) {
+    const index = optionsString.indexOf(` ${behavior} `);
+    if (index > -1) {
+      if (earliestMatch > index) {
+        earliestMatch = index;
+        behaviorMatch = behavior;
+      }
+    }
+  }
+
+  if (behaviorMatch) {
+    options.behavior = behaviorMatch;
+  }
+
+  // "Both directions" case
   if (!options.block && !options.inline) {
     options.block = true;
     options.inline = true;
   }
 
   return options;
-};
+}
