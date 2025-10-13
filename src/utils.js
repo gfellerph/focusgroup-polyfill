@@ -154,7 +154,7 @@ export function getFocusgroupOptions(focusGroup) {
   };
 
   // Pattern matching for ARIA roles, first defined wins
-  const earliestMatch = Infinity;
+  let earliestMatch = Infinity;
   let behaviorMatch = null;
 
   for (const behavior of behaviors) {
