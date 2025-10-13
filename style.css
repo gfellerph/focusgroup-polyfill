@@ -1,69 +1,27 @@
-/* Neo-Brutalist Skeleton Content Styles */
-/* Neo-Brutalist Skeleton Content Styles (Neutral) */
-.neo-skeleton-content {
-  margin-bottom: 2rem;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  background: white;
-  border: 4px solid var(--primary-foreground);
-  border-top-width: 0;
-  border-bottom-left-radius: 1.2rem;
-  border-bottom-right-radius: 1.2rem;
-  box-shadow: 4px 4px 0 var(--primary-foreground);
+/* VS Code Default Light Theme HTML Code Highlighting */
+.vsc-code-block {
+  font-family: "Fira Mono", "Menlo", "Consolas", "Monaco", monospace;
+  color: #24292e;
 }
-.neo-skeleton {
-  background: #e0e0e0;
-  border: 2px solid #d1d1d1;
-  border-radius: 1.2rem;
-  min-height: 1.5rem;
-  width: 100%;
+.vsc-code-block code {
+  background: none;
+  padding: 0;
+  color: inherit;
 }
-.neo-skeleton--title {
-  min-height: 2.5rem;
-  width: 60%;
-  margin-bottom: 0.5rem;
+.vsc-tag {
+  color: #0451a5;
 }
-.neo-skeleton--subtitle {
-  min-height: 1.5rem;
-  width: 40%;
-  margin-bottom: 0.5rem;
+.vsc-attr {
+  color: #b75501;
 }
-.neo-skeleton--bar {
-  min-height: 1.2rem;
-  width: 100%;
+.vsc-eq {
+  color: #000;
 }
-.neo-skeleton--bar.short {
-  width: 60%;
+.vsc-code-block .vsc-tag {
+  font-weight: bold;
 }
-.neo-skeleton-cards {
-  display: flex;
-  gap: 1.5rem;
-  margin-top: 2rem;
-}
-.neo-skeleton-card {
-  background: #fafafa;
-  border: 2px solid #d1d1d1;
-  border-radius: 1.2rem;
-  padding: 1.2rem 1rem 1rem 1rem;
-  flex: 1 1 0;
-  min-width: 180px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-}
-.neo-skeleton--card-title {
-  min-height: 1.5rem;
-  width: 70%;
-  margin-bottom: 0.3rem;
-}
-.neo-skeleton--card-bar {
-  min-height: 1rem;
-  width: 100%;
-}
-.neo-skeleton--card-bar.short {
-  width: 60%;
+.vsc-code-block .vsc-attr {
+  font-style: italic;
 }
 /* Neo-Brutalist Navigation Example Styles */
 .neo-nav {
@@ -95,9 +53,7 @@
 }
 .neo-nav__link {
   display: block;
-  background: #fff;
   color: var(--primary-foreground);
-  border: 2.5px solid var(--primary-foreground);
   border-radius: 0.7em;
   padding: 0.5em 1.2em;
   font-size: 1.1rem;
@@ -106,9 +62,12 @@
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
   outline: none;
 }
-.neo-nav__link:hover,
+.neo-nav__link:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 4px;
+}
 .neo-nav__link:focus {
-  box-shadow: 4px 4px 0 var(--primary-foreground);
+  outline: 4px solid var(--accent-foreground);
 }
 @media (max-width: 700px) {
   .neo-nav {
@@ -120,6 +79,17 @@
   .neo-nav__links {
     flex-wrap: wrap;
   }
+}
+.neo-content {
+  background-color: var(--secondary-background);
+  border: 4px solid var(--primary-foreground);
+  border-top-width: 0;
+  border-bottom-left-radius: 1.2rem;
+  border-bottom-right-radius: 1.2rem;
+  box-shadow: 4px 4px 0 var(--primary-foreground);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
 }
 /* WYSIWYG Toolbar Neo-Brutalist Styles */
 .wysiwyg-toolbar {
@@ -169,12 +139,12 @@
   width: 3rem;
   height: 3rem;
 }
-.wysiwyg-btn:hover,
-.wysiwyg-btn:focus {
-  background: #fff200;
-  color: #181818;
-  border-color: #181818;
+.wysiwyg-btn:hover {
   box-shadow: 4px 4px 0 #181818;
+}
+.wysiwyg-btn:focus-visible {
+  outline: 4px solid var(--accent-foreground);
+  outline-offset: 2px;
 }
 .wysiwyg-btn svg {
   display: block;

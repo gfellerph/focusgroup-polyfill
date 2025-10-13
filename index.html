@@ -165,24 +165,15 @@
           </li>
         </ul>
       </nav>
-      <div class="neo-skeleton-content" aria-hidden="true">
-        <div class="neo-skeleton-cards">
-          <div class="neo-skeleton-card">
-            <div class="neo-skeleton neo-skeleton--card-title"></div>
-            <div class="neo-skeleton neo-skeleton--card-bar"></div>
-            <div class="neo-skeleton neo-skeleton--card-bar short"></div>
-          </div>
-          <div class="neo-skeleton-card">
-            <div class="neo-skeleton neo-skeleton--card-title"></div>
-            <div class="neo-skeleton neo-skeleton--card-bar"></div>
-            <div class="neo-skeleton neo-skeleton--card-bar short"></div>
-          </div>
-          <div class="neo-skeleton-card">
-            <div class="neo-skeleton neo-skeleton--card-title"></div>
-            <div class="neo-skeleton neo-skeleton--card-bar"></div>
-            <div class="neo-skeleton neo-skeleton--card-bar short"></div>
-          </div>
-        </div>
+      <div class="neo-content" aria-hidden="true">
+        <pre
+          class="vsc-code-block"
+        ><code class="language-html"><span class="vsc-tag">&lt;ul</span> <span class="vsc-attr">focusgroup</span><span class="vsc-eq">="menubar inline"</span><span class="vsc-tag">&gt;</span>
+  <span class="vsc-tag">&lt;li&gt;</span><span class="vsc-tag">&lt;a</span> <span class="vsc-attr">href</span><span class="vsc-eq">="#features"</span> <span class="vsc-attr">role</span><span class="vsc-eq">="menuitem"</span><span class="vsc-tag">&gt;</span>Features<span class="vsc-tag">&lt;/a&gt;</span><span class="vsc-tag">&lt;/li&gt;</span>
+  <span class="vsc-tag">&lt;li&gt;</span><span class="vsc-tag">&lt;a</span> <span class="vsc-attr">href</span><span class="vsc-eq">="#install"</span> <span class="vsc-attr">role</span><span class="vsc-eq">="menuitem"</span><span class="vsc-tag">&gt;</span>Install<span class="vsc-tag">&lt;/a&gt;</span><span class="vsc-tag">&lt;/li&gt;</span>
+  <span class="vsc-tag">&lt;li&gt;</span><span class="vsc-tag">&lt;a</span> <span class="vsc-attr">href</span><span class="vsc-eq">="#demo"</span> <span class="vsc-attr">role</span><span class="vsc-eq">="menuitem"</span><span class="vsc-tag">&gt;</span>Demo<span class="vsc-tag">&lt;/a&gt;</span><span class="vsc-tag">&lt;/li&gt;</span>
+  <span class="vsc-tag">&lt;li&gt;</span><span class="vsc-tag">&lt;a</span> <span class="vsc-attr">href</span><span class="vsc-eq">="https://github.com"</span> <span class="vsc-attr">role</span><span class="vsc-eq">="menuitem"</span><span class="vsc-tag">&gt;</span>GitHub<span class="vsc-tag">&lt;/a&gt;</span><span class="vsc-tag">&lt;/li&gt;</span>
+<span class="vsc-tag">&lt;/ul&gt;</span></code></pre>
       </div>
     </section>
 
@@ -190,7 +181,7 @@
       <h2>Toolbar example</h2>
       <div
         class="wysiwyg-toolbar"
-        focusgroup="inline"
+        focusgroup="toolbar inline"
         role="toolbar"
         aria-label="WYSIWYG Toolbar"
       >
@@ -228,18 +219,26 @@
         aria-label="WYSIWYG Editor"
         tabindex="0"
       >
-        Type here and use the toolbar above to style your text!
+        <pre class="vsc-code-block"><code class="language-html"><span class="vsc-tag">&lt;div</span> <span class="vsc-attr">focusgroup</span><span class="vsc-eq">="toolbar inline"</span><span class="vsc-tag">&gt;</span>
+  <span class="vsc-tag">&lt;button&gt;</span>Bold<span class="vsc-tag">&lt;/button&gt;</span>
+  <span class="vsc-tag">&lt;button&gt;</span>Italic<span class="vsc-tag">&lt;/button&gt;</span>
+  <span class="vsc-tag">&lt;button&gt;</span>Underline<span class="vsc-tag">&lt;/button&gt;</span>
+<span class="vsc-tag">&lt;/div&gt;</span></code></pre>
+        </pre>
       </div>
-
-      <pre>
-      <code>
-        &lt;div <strong>focusgroup</strong> role="toolbar"&gt;
-          &lt;button&gt;Bold&lt;/button&gt;
-          &lt;button&gt;Italic&lt;/button&gt;
-          &lt;button&gt;Underline&lt;/button&gt;
-        &lt;/div&gt;
-      </code>
-    </pre>
     </section>
+    <footer>
+      <div class="container">
+        <p>
+          Created by <a href="https://github.com/gfellerph">Philipp Gfeller</a>.
+          The source code is available on
+          <a
+            href="https://github.com/gfellerph/focusgroup-polyfill"
+            rel="noopener"
+            >GitHub</a
+          >
+        </p>
+      </div>
+    </footer>
   </body>
 </html>
