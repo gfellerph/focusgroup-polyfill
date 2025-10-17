@@ -30,16 +30,15 @@
     "access": "public"
   },
   "scripts": {
-    "start": "vite",
+    "start": "http-server",
     "build": "esbuild main.js --bundle --minify --outfile=cdn.js",
     "test": "playwright test",
     "testui": "playwright test --ui",
     "prepublish": "pnpm build"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.1",
-    "@types/node": "^20.14.1",
-    "esbuild": "^0.20.0",
-    "vite": "^5.3.3"
+    "@playwright/test": "^1.55.0",
+    "esbuild": "^0.25.9",
+    "http-server": "^14.1.1"
   }
 }

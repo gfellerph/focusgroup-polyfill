@@ -9,10 +9,11 @@ test("has title", async ({ page }) => {
   await expect(page).toHaveTitle("Focusgroup");
 });
 
-test("Reference tab test", async ({ page }) => {
+test("Reference tab test", async ({ page, browserName }) => {
   const button1 = await page.$("#regular-focusgroup-button-1");
   await button1?.focus();
-  await button1?.press("Tab");
+  const tabKey = browserName === "webkit" ? "Alt+Tab" : "Tab";
+  await button1?.press(tabKey);
   await expect(page.locator("#rtl-focusgroup-button-1")).toBeFocused();
 });
 

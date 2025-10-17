@@ -1,6 +1,9 @@
-// https://github.com/WICG/webcomponents/issues/1029
+/*
+ * An attempt at creating attributes with lifecycles - a little
+ * bit like custom elements. Inspired by https://github.com/WICG/webcomponents/issues/1029
+ */
 
-const observerConfig: MutationObserverInit = {
+const observerConfig = {
   attributes: true,
   subtree: true,
   attributeOldValue: true,
@@ -9,52 +12,125 @@ const observerConfig: MutationObserverInit = {
   childList: true,
 };
 
-const registries = new WeakMap<
-  object,
-  { observer: MutationObserver; attributes: string[] }
->();
+/**
+ * Represents a registry of custom attributes.
+ */
+const registries = new WeakMap();
 
+/**
+ * Represents a custom attribute on an element.
+ */
 export class Attribute {
-  #host: Element;
-  #name: string;
+  #host;
+  #name;
 
-  public get host() {
+  /**
+   * Get the host element of the attribute.
+   * @returns {Element}
+   */
+  get host() {
     return this.#host;
   }
 
-  public get value() {
+  /**
+   * Get the name of the attribute.
+   * @returns {string}
+   */
+  get name() {
+    return this.#name;
+  }
+
+  /**
+   * Get the value of the attribute.
+   * @returns {string | null}
+   */
+  get value() {
     return this.#host.getAttribute(this.#name);
   }
 
-  constructor(name: string, host: Element) {
+  /**
+   * Create an instance of the attribute.
+   * @param {string} name
+   * @param {Element} host
+   */
+  constructor(name, host) {
     this.#host = host;
     this.#name = name;
   }
 
-  connectedCallback(_value: string | null) {
+  /**
+   * Called when the attribute is connected to the host element.
+   * @param {string | null} _value - The initial value of the attribute.
+   */
+  connectedCallback(_value) {
     // console.log("native created");
   }
 
-  changedCallback(_newValue: string | null, _oldValue?: string | null) {
+  /**
+   * Called when the attribute value changes.
+   * @param {string | null} _newValue - The new value of the attribute.
+   * @param {string | null} _oldValue - The old value of the attribute.
+   */
+  changedCallback(_newValue, _oldValue) {
     // console.log("native changed");
   }
 
+  /**
+   * Called when the attribute is disconnected from the host element.
+   */
   disconnectedCallback() {
     // console.log("native removed");
   }
 }
 
-type CustomAttribute<T extends Attribute> = new (...args: any[]) => T;
+/**
+ * @template T
+ * @typedef {new (...args: any[]) => T} Attribute
+ */
 
-export function registerAttribute<T extends Attribute>(
-  name: string,
-  customAttribute: CustomAttribute<T>,
-  root: Document | DocumentFragment | Element = document,
-  childList = true
+const validAttributeNames = new RegExp(/^(?:[A-Z_]|-[A-Z-_])[A-Z0-9_-]*$/i);
+
+/**
+ * Register a custom attribute on a given root element.
+ * @param {string} name - The name of the attribute.
+ * @param {Attribute} customAttribute - The custom attribute class.
+ * @param {Document | DocumentFragment | Element} root - The root element to observe.
+ * @param {boolean} deep - Whether to observe child elements.
+ * @returns {void}
+ */
+export function registerAttribute(
+  name,
+  customAttribute,
+  root = document,
+  deep = true
 ) {
-  const observedElements = new WeakMap<Element, Attribute>();
+  if (!validAttributeNames.test(name)) {
+    console.error(
+      `Failed to execute 'registerAttribute': the name "${name}" is not a valid attribute name.`
+    );
+    return;
+  }
+
+  if (!(customAttribute.prototype instanceof Attribute)) {
+    console.error(
+      `Failed to execute 'registerAttribute': the customAttribute is not a valid CustomAttribute instance.`
+    );
+    return;
+  }
+
+  if (!(root instanceof Document || root instanceof Element)) {
+    console.error(
+      `Failed to execute 'registerAttribute': the root is not a valid Document or Element.`
+    );
+    return;
+  }
+
+  // Normalize childList option, if it's anything else than true, it's false
+  deep = deep === true;
+
+  const observedElements = new WeakMap();
   const existingObserver = registries.get(root);
-  let observer: MutationObserver;
+  let observer;
   let attributeFilter = [name];
 
   if (existingObserver) {
@@ -108,6 +184,7 @@ export function registerAttribute<T extends Attribute>(
         return;
       }
 
+      // Attribute changed
       if (record.type === "attributes" && record.target instanceof Element) {
         const newValue = record.target.getAttribute(name);
         const oldValue = record.oldValue;
@@ -117,7 +194,7 @@ export function registerAttribute<T extends Attribute>(
           newAttribute(record.target);
         } else if (newValue === null && observedElements.has(record.target)) {
           // Deleted
-          const cls = observedElements.get(record.target)!;
+          const cls = observedElements.get(record.target);
           cls.disconnectedCallback();
           observedElements.delete(record.target);
         } else if (
@@ -125,24 +202,33 @@ export function registerAttribute<T extends Attribute>(
           observedElements.has(record.target)
         ) {
           // Change
-          const cls = observedElements.get(record.target)!;
+          const cls = observedElements.get(record.target);
           cls.changedCallback(newValue, record.oldValue);
         }
       }
     }
   }
 
-  function newAttribute(element: Element) {
+  /**
+   * Instantiate new attribute
+   * @param {Element} element
+   */
+  function newAttribute(element) {
     const cls = new customAttribute(name, element);
     cls.connectedCallback(element.getAttribute(name));
     observedElements.set(element, cls);
   }
 
   // Start listening to changes
-  observer.observe(root, { ...observerConfig, attributeFilter, childList });
+  observer.observe(root, {
+    ...observerConfig,
+    attributeFilter,
+    childList: deep,
+    subtree: deep,
+  });
 
   // Initial pass
-  if (childList) {
+  if (deep) {
     root.querySelectorAll(`[${name}]`).forEach((element) => {
       newAttribute(element);
     });
@@ -152,25 +238,3 @@ export function registerAttribute<T extends Attribute>(
     // Throw error or what?
   }
 }
-
-class TestingAttribute extends Attribute {
-  clickHandler() {
-    console.log(this.value);
-  }
-  connectedCallback(value: string | null): void {
-    console.log("testing attribute connected", value);
-    this.host.addEventListener("click", this.clickHandler);
-  }
-  changedCallback(
-    newValue: string | null,
-    oldValue?: string | null | undefined
-  ): void {
-    console.log(oldValue, newValue);
-  }
-  disconnectedCallback(): void {
-    console.log("testing attribute disconnected");
-    this.host.removeEventListener("click", this.clickHandler);
-  }
-}
-
-registerAttribute("custom-attribute", TestingAttribute);

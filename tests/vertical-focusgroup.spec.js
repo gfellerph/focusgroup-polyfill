@@ -40,8 +40,9 @@ test("Pressing down arrow on last element scrolls the page", async ({
 }) => {
   const scrollTopBefore = await page.evaluate(() => window.scrollY);
   // Why does it not work with only one arrow press?
-  await page.locator("#vertical-focusgroup-button-5").press("ArrowDown");
-  await page.locator("#vertical-focusgroup-button-5").press("ArrowDown");
+  for await (let i of Array(10).keys()) {
+    await page.locator("#vertical-focusgroup-button-5").press("ArrowDown");
+  }
   const scrollTopAfter = await page.evaluate(() => window.scrollY);
   expect(scrollTopAfter).toBeGreaterThan(scrollTopBefore);
 });

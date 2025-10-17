@@ -4,7 +4,7 @@
  * @param {Element} element
  * @returns {Element | ShadowRoot}
  */
-const getRoot = (element: Element): Element | ShadowRoot => {
+const getRoot = (element) => {
   return element.shadowRoot || element;
 };
 
@@ -14,7 +14,7 @@ const getRoot = (element: Element): Element | ShadowRoot => {
  * @param {Element} element
  * @returns {HTMLCollection | null}
  */
-export const getChildren = (element: Element): HTMLCollection | null => {
+export const getChildren = (element) => {
   const root = getRoot(element);
   if ("assignedElements" in element) {
     return root.assignedElements();
@@ -32,7 +32,7 @@ export const getChildren = (element: Element): HTMLCollection | null => {
  * @param {Element} element
  * @returns {Element | null}
  */
-export const getParent = (element: Element): Element | null => {
+export const getParent = (element) => {
   if (element.assignedSlot !== null) {
     return element.assignedSlot;
   }
@@ -47,14 +47,26 @@ export const getParent = (element: Element): Element | null => {
 };
 
 /**
- * Returns the first child, including slotted elements
- * @param {Element} element
- * @returns {Element | null}
+ * Recursively queries a shadow DOM tree for elements matching a filter function
+ * @param {Element} root
+ * @param {Function} filter
+ * @param {Function} boundary
+ * @returns {Element[]}
  */
-export const getFirstChild = (element: Element): Element | null => {
-  const children = getChildren(element);
-  if (children?.length > 0) {
-    return children[0];
+export function shadowQuerySelector(
+  root,
+  filter = () => true,
+  boundary = () => false
+) {
+  let candidates = [];
+
+  if (filter(root)) candidates.push(root);
+
+  for (const child of getChildren(root)) {
+    if (boundary(child)) continue;
+    const result = shadowQuerySelector(child, filter, boundary);
+    candidates = candidates.concat(result);
   }
-  return null;
-};
+
+  return candidates;
+}
