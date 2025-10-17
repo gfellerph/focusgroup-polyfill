@@ -4,7 +4,7 @@
 const focusableElementsSelector = [
   "button",
   'input:not([type="hidden"])',
-  "[tabindex]",
+  '[tabindex]:not([tabindex^="-"])',
   "select",
   "textarea",
   "[contenteditable]",
