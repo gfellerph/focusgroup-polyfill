@@ -4,7 +4,7 @@
 export const focusableSelector = `:where(${[
   "button",
   'input:not([type="hidden"])',
-  "[tabindex]",
+  '[tabindex]:not([tabindex^="-"])',
   "select",
   "textarea",
   "[contenteditable]",
