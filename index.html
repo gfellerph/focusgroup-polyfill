@@ -14,7 +14,7 @@
         <h1>focusgroup</h1>
         <p>
           Focusgroup simplifies focus management for UI elements like toolbars
-          and navigations by offering keyboard navigation with arrow keys,
+          and navigations by offering keyboard navigation with arrow keys and
           reducing tab stops in the document. Focusgroup ensures consistency and
           accessibility across devices and input methods.
         </p>
@@ -46,11 +46,7 @@
     </header>
 
     <section class="container">
-      <h2>Use focusgroup today</h2>
-      <p>
-        Install the polyfill and enhance your UI controls without waiting for
-        browser support.
-      </p>
+      <h2>Installation</h2>
 
       <div class="install-command">
         <pre><code aria-describedby="install-command-description">npm i <span class="code-string">@gfellerph/focusgroup-polyfill</span></code></pre>
@@ -116,7 +112,7 @@
     </section>
 
     <section class="container">
-      <h2>Navigation example</h2>
+      <h2 id="navigation">Navigation</h2>
       <nav class="neo-nav" role="navigation" aria-label="Main Navigation">
         <a class="neo-nav__logo" href="#">
           <span class="visually-hidden">Back to homepage</span>
@@ -141,23 +137,20 @@
             <circle cx="18" cy="18" r="7" fill="#181818" />
           </svg>
         </a>
-        <ul class="neo-nav__links" focusgroup="inline" role="menubar">
+        <ul class="neo-nav__links" focusgroup="inline">
           <li>
-            <a href="#features" class="neo-nav__link" role="menuitem"
-              >Features</a
-            >
+            <a href="#features" class="neo-nav__link">Features</a>
           </li>
           <li>
-            <a href="#install" class="neo-nav__link" role="menuitem">Install</a>
+            <a href="#install" class="neo-nav__link">Install</a>
           </li>
           <li>
-            <a href="#demo" class="neo-nav__link" role="menuitem">Demo</a>
+            <a href="#demo" class="neo-nav__link">Demo</a>
           </li>
           <li>
             <a
               href="https://github.com/gfellerph/focusgroup-polyfill"
               class="neo-nav__link"
-              role="menuitem"
               target="_blank"
               rel="noopener"
               >GitHub</a
@@ -167,27 +160,26 @@
       </nav>
       <div class="neo-content" aria-hidden="true">
         <pre
-          class="vsc-code-block"
-        ><code class="language-html"><span class="vsc-tag">&lt;ul</span> <span class="vsc-attr">focusgroup</span><span class="vsc-eq">="menubar inline"</span><span class="vsc-tag">&gt;</span>
-  <span class="vsc-tag">&lt;li&gt;</span><span class="vsc-tag">&lt;a</span> <span class="vsc-attr">href</span><span class="vsc-eq">="#features"</span> <span class="vsc-attr">role</span><span class="vsc-eq">="menuitem"</span><span class="vsc-tag">&gt;</span>Features<span class="vsc-tag">&lt;/a&gt;</span><span class="vsc-tag">&lt;/li&gt;</span>
-  <span class="vsc-tag">&lt;li&gt;</span><span class="vsc-tag">&lt;a</span> <span class="vsc-attr">href</span><span class="vsc-eq">="#install"</span> <span class="vsc-attr">role</span><span class="vsc-eq">="menuitem"</span><span class="vsc-tag">&gt;</span>Install<span class="vsc-tag">&lt;/a&gt;</span><span class="vsc-tag">&lt;/li&gt;</span>
-  <span class="vsc-tag">&lt;li&gt;</span><span class="vsc-tag">&lt;a</span> <span class="vsc-attr">href</span><span class="vsc-eq">="#demo"</span> <span class="vsc-attr">role</span><span class="vsc-eq">="menuitem"</span><span class="vsc-tag">&gt;</span>Demo<span class="vsc-tag">&lt;/a&gt;</span><span class="vsc-tag">&lt;/li&gt;</span>
-  <span class="vsc-tag">&lt;li&gt;</span><span class="vsc-tag">&lt;a</span> <span class="vsc-attr">href</span><span class="vsc-eq">="https://github.com"</span> <span class="vsc-attr">role</span><span class="vsc-eq">="menuitem"</span><span class="vsc-tag">&gt;</span>GitHub<span class="vsc-tag">&lt;/a&gt;</span><span class="vsc-tag">&lt;/li&gt;</span>
-<span class="vsc-tag">&lt;/ul&gt;</span></code></pre>
+        ><code class="code-block"><span class="code-tag">&lt;ul</span> <span class="code-attr">focusgroup</span><span class="code-eq">="inline"</span><span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;li&gt;</span><span class="code-tag">&lt;a</span> <span class="code-attr">href</span><span class="code-eq">="#features"</span><span class="code-tag">&gt;</span>Features<span class="code-tag">&lt;/a&gt;</span><span class="code-tag">&lt;/li&gt;</span>
+  <span class="code-tag">&lt;li&gt;</span><span class="code-tag">&lt;a</span> <span class="code-attr">href</span><span class="code-eq">="#install"</span></span><span class="code-tag">&gt;</span>Install<span class="code-tag">&lt;/a&gt;</span><span class="code-tag">&lt;/li&gt;</span>
+  <span class="code-tag">&lt;li&gt;</span><span class="code-tag">&lt;a</span> <span class="code-attr">href</span><span class="code-eq">="#demo"</span></span><span class="code-tag">&gt;</span>Demo<span class="code-tag">&lt;/a&gt;</span><span class="code-tag">&lt;/li&gt;</span>
+  <span class="code-tag">&lt;li&gt;</span><span class="code-tag">&lt;a</span> <span class="code-attr">href</span><span class="code-eq">="https://github.com"</span></span><span class="code-tag">&gt;</span>GitHub<span class="code-tag">&lt;/a&gt;</span><span class="code-tag">&lt;/li&gt;</span>
+<span class="code-tag">&lt;/ul&gt;</span></code></pre>
       </div>
     </section>
 
     <section class="container">
-      <h2>Toolbar example</h2>
+      <h2 id="toolbar">Toolbar</h2>
       <div
-        class="wysiwyg-toolbar"
+        class="toolbar"
         focusgroup="toolbar inline"
         role="toolbar"
         aria-label="WYSIWYG Toolbar"
       >
         <button
           type="button"
-          class="wysiwyg-btn"
+          class="toolbar-btn"
           aria-label="Bold"
           title="Bold (Ctrl+B)"
           data-command="bold"
@@ -196,7 +188,7 @@
         </button>
         <button
           type="button"
-          class="wysiwyg-btn"
+          class="toolbar-btn"
           aria-label="Italic"
           title="Italic (Ctrl+I)"
           data-command="italic"
@@ -205,7 +197,7 @@
         </button>
         <button
           type="button"
-          class="wysiwyg-btn"
+          class="toolbar-btn"
           aria-label="Underline"
           title="Underline (Ctrl+U)"
           data-command="underline"
@@ -214,17 +206,18 @@
         </button>
       </div>
       <div
-        class="wysiwyg-editor"
+        class="toolbar-editor"
         contenteditable="true"
         aria-label="WYSIWYG Editor"
         tabindex="0"
       >
-        <pre class="vsc-code-block"><code class="language-html"><span class="vsc-tag">&lt;div</span> <span class="vsc-attr">focusgroup</span><span class="vsc-eq">="toolbar inline"</span><span class="vsc-tag">&gt;</span>
-  <span class="vsc-tag">&lt;button&gt;</span>Bold<span class="vsc-tag">&lt;/button&gt;</span>
-  <span class="vsc-tag">&lt;button&gt;</span>Italic<span class="vsc-tag">&lt;/button&gt;</span>
-  <span class="vsc-tag">&lt;button&gt;</span>Underline<span class="vsc-tag">&lt;/button&gt;</span>
-<span class="vsc-tag">&lt;/div&gt;</span></code></pre>
-        </pre>
+        <pre
+          
+        ><code class="code-block"><span class="code-tag">&lt;div</span> <span class="code-attr">focusgroup</span><span class="code-eq">="toolbar inline"</span><span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;button&gt;</span>Bold<span class="code-tag">&lt;/button&gt;</span>
+  <span class="code-tag">&lt;button&gt;</span>Italic<span class="code-tag">&lt;/button&gt;</span>
+  <span class="code-tag">&lt;button&gt;</span>Underline<span class="code-tag">&lt;/button&gt;</span>
+<span class="code-tag">&lt;/div&gt;</span></code></pre>
       </div>
     </section>
     <footer>
