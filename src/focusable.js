@@ -9,7 +9,6 @@ const focusableElementsSelector = [
   "textarea",
   "[contenteditable]",
   `a[href]`,
-  `iframe`,
   `audio[controls]`,
   `video[controls]`,
   `area[href]`,
