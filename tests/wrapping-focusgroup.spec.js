@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/tests/index.html");
 });
 
 test("Wrapping focusgroup arrow right should focus next button", async ({

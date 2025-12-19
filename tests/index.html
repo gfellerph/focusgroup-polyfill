@@ -483,11 +483,49 @@
     <h2>Focusgroup in a dialog</h2>
     <button onclick="this.nextElementSibling.showModal()">Open dialog</button>
     <dialog focusgroup>
-      <button autofocus id="testpopover-button-1">Button 1</button>
-      <button id="testpopover-button-2">Button 2</button>
-      <button id="testpopover-button-3">Button 3</button>
-      <button id="testpopover-button-4">Button 4</button>
+      <button autofocus id="testdialog-button-1">Button 1</button>
+      <button id="testdialog-button-2">Button 2</button>
+      <button id="testdialog-button-3">Button 3</button>
+      <button id="testdialog-button-4">Button 4</button>
     </dialog>
+
+    <h2>Focus entry priority</h2>
+    <div focusgroup id="entry-priority-focusgroup">
+      <button>Button 1</button>
+      <button focusgroup-entry-priority>Button 2 (entry priority)</button>
+      <button>Button 3</button>
+      <button>Button 4</button>
+      <button>Button 5</button>
+    </div>
+
+    <h2>Duplicate entry priority</h2>
+    <div focusgroup id="duplicate-entry-priority-focusgroup">
+      <button>Button 1</button>
+      <button focusgroup-entry-priority>Button 2 (entry priority)</button>
+      <button focusgroup-entry-priority>
+        Button 3 (second entry priority, should be ignored)
+      </button>
+      <button>Button 4</button>
+      <button>Button 5</button>
+    </div>
+
+    <h2>Entry priority with nomemory</h2>
+    <div focusgroup="no-memory" id="entry-priority-nomemory-focusgroup">
+      <button>Button 1</button>
+      <button focusgroup-entry-priority>Button 2 (entry priority)</button>
+      <button>Button 3</button>
+      <button>Button 4</button>
+      <button>Button 5</button>
+    </div>
+
+    <h2>Entry priority with key conflict element</h2>
+    <div focusgroup>
+      <button>Button 1</button>
+      <button focusgroup-entry-priority>Button 3</button>
+      <button>Button 4</button>
+      <label>Conflicting element: <input type="text" /></label>
+      <button>Button 5</button>
+    </div>
 
     <h2>Different focusable elements</h2>
     <div focusgroup>
