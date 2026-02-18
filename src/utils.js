@@ -38,19 +38,18 @@ export function isFocusgroup(element) {
  * @returns {boolean}
  */
 export function isFocusgroupCandidate(element) {
-  const focusgroup = getParentFocusgroup(element);
+  const { focusgroup, options } = getFocusgroupInfo(element);
 
-  // Check if element is part of a focusgroup
+  // Ensure element is part of a focusgroup
   if (!focusgroup) return false;
 
-  // Check if the focusgroup options is not none
-  const options = getFocusgroupOptions(focusgroup);
+  // Ensure the focusgroup options is not none
   if (options.none) return false;
 
-  // Check if the element is focusable
+  // Ensure the element is focusable
   if (!isFocusable(element)) return false;
 
-  // Check if the element has no key conflict
+  // Ensure the element has no key conflict
   if (element.matches(keyConflictSelector)) return false;
 
   // All checks passed, this is a candidate
@@ -58,7 +57,30 @@ export function isFocusgroupCandidate(element) {
 }
 
 /**
- * Find the nearest parent focusgroup
+ * Get information about the focusgroup an element belongs to
+ * @param {Element} element
+ * @returns {Object|null}
+ */
+export function getFocusgroupInfo(element) {
+  let focusgroup;
+
+  if (isFocusgroup(element)) {
+    focusgroup = element;
+  } else {
+    focusgroup = getParentFocusgroup(element);
+  }
+
+  if (!focusgroup) return { focusgroup: null, options: null };
+
+  const options = getFocusgroupOptions(focusgroup);
+  return {
+    focusgroup,
+    options,
+  };
+}
+
+/**
+ * Find the nearest focusgroup
  * @param {Element} element
  * @returns {Element | null}
  */

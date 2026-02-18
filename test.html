@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <mi-component text="head"></mi-component>
+  </head>
+  <body>
+    <mi-component text="body"></mi-component>
+    <button>first</button>
+    <button id="not-focusable">not focusable</button>
+    <button id="jumper-target">jumper target</button>
+    <button>last</button>
+
+    <ul id="log" style="max-height: 50vh; overflow-y: auto"></ul>
+
+    <script>
+      class MIComponent extends HTMLElement {
+        constructor() {
+          super();
+          console.log(this.getAttribute("text"));
+        }
+      }
+      customElements.define("mi-component", MIComponent);
+      document.addEventListener("focusin", (event) => {
+        const log = document.getElementById("log");
+        const li = document.createElement("li");
+        li.textContent = `FocusIn: ${event.target.textContent}`;
+        log.appendChild(li);
+        log.scrollTop = log.scrollHeight;
+      });
+
+      document.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("focus", (event) => {
+          const log = document.getElementById("log");
+          const li = document.createElement("li");
+          li.textContent = `Focus: ${event.target.textContent}`;
+          log.appendChild(li);
+          log.scrollTop = log.scrollHeight;
+        });
+      });
+
+      document.addEventListener("focusout", (event) => {
+        const log = document.getElementById("log");
+        const li = document.createElement("li");
+        li.textContent = `FocusOut: ${event.target.textContent}`;
+        log.appendChild(li);
+        log.scrollTop = log.scrollHeight;
+      });
+
+      const notFocusableButton = document.getElementById("not-focusable");
+      notFocusableButton.addEventListener("focus", (event) => {
+        document.getElementById("jumper-target").focus();
+      });
+    </script>
+  </body>
+</html>

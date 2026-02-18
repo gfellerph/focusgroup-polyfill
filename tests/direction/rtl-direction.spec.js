@@ -2,7 +2,7 @@
 import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/tests/index.html");
+  await page.goto("/tests/direction/rtl-direction.spec.html");
 });
 
 test("RTL focusgroup arrow right", async ({ page }) => {

@@ -31,7 +31,7 @@ const focusDisablingParentSelecor = `:where(${focusDisablingSelector})`;
 
 // These elements already use arrow keys for navigation, tab should be used to exit
 export const keyConflictSelector = [
-  'input:is([type="text"],[type="radio"],[type="url"],[type="password"],[type="search"],[type="number"],[type="email"],[type="tel"])',
+  'input:is([type="text"],[type="radio"],[type="url"],[type="password"],[type="search"],[type="number"],[type="email"],[type="tel"],[type="date"],[type="time"],[type="month"],[type="week"],[type="datetime-local"])',
   "select",
   "textarea",
   "[contenteditable]",

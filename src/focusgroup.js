@@ -1,9 +1,13 @@
-import { shadowQuerySelector } from "./shadow-tree-walker/shadow-tree-walker.js";
+import {
+  shadowQuerySelector,
+  getParent,
+} from "./shadow-tree-walker/shadow-tree-walker.js";
 import {
   setRovingTabindex,
   disableRovingTabindex,
   initializeRovingTabindex,
   resetRovingTabindex,
+  isRovingTabindexInitialized,
 } from "./roving-tabindex.js";
 import {
   Attribute,
@@ -14,9 +18,9 @@ import {
   getFocusgroupOptions,
   getParentFocusgroup,
   getDirectionMap,
-  isFocusgroupCandidate,
   DIRECTION,
   focusGroupSupported,
+  getFocusgroupInfo,
 } from "./utils.js";
 import { isFocusable } from "./focusable.js";
 
@@ -28,7 +32,7 @@ const observedRoots = new WeakMap();
  * its descendants
  * @param {Element} root
  */
-export default function registerFocusGroupPolyfill(root = window) {
+export default function registerFocusGroupPolyfill(root = globalThis) {
   if (!focusGroupSupported && !observedRoots.has(root)) {
     observedRoots.set(root, true);
     root.addEventListener("focusin", focusInHandler);
@@ -64,14 +68,31 @@ function focusInHandler(focusEvent) {
   const activeElement = getActiveElement(focusEvent);
 
   // Check if target is a candidate
-  const isCandidate = isFocusgroupCandidate(activeElement);
+  const { focusgroup, options } = getFocusgroupInfo(activeElement);
+  const isCandidate = !!focusgroup;
 
   // If it is, start to handle keydown events
   if (isCandidate) {
-    const focusgroup = getParentFocusgroup(activeElement);
+    // Check if there is a focusgroup entry priority for this group
+    // Entry priority is only given upon first entry into the focusgroup
+    if (
+      !isRovingTabindexInitialized(focusgroup) &&
+      !options.nomemory &&
+      !options.none
+    ) {
+      const entryPriority = getEntryPriority(focusgroup);
+      if (entryPriority && activeElement !== entryPriority) {
+        // Set focus on the entry priority element, initialisation will happen next
+        entryPriority.focus();
+
+        // Abandon ship, this is not the element we're looking for
+        return;
+      }
+    }
+
     registerAttribute("focusgroup", FocusgroupAttribute, focusgroup, false);
 
-    // Check if there are parent focusgroups and disable roving tabindex on them
+    // Check if there are parent focusgroups and disable roving tabindex on them to return them to the normal tab order
     let currentParentFocusgroup = getParentFocusgroup(focusgroup);
     while (currentParentFocusgroup) {
       disableRovingTabindex(currentParentFocusgroup);
@@ -114,6 +135,20 @@ function handleKeydown(event, focusTarget, focusGroup) {
   }
 }
 
+function getCandidates(element) {
+  return shadowQuerySelector(element, isFocusable, isFocusgroup);
+}
+
+function getEntryPriority(focusgroupElement) {
+  const candidates = getCandidates(focusgroupElement);
+  for (const candidate of candidates) {
+    if (candidate.matches("[focusgroup-entry-priority]")) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
 /**
  * Figure out which node to focus next
  * @param {Element} activeElement The currently focused element
@@ -123,11 +158,7 @@ function handleKeydown(event, focusTarget, focusGroup) {
  * @param {KeyboardEvent} event The event that fired
  */
 function focusNode(activeElement, activeFocusGroup, options, direction, event) {
-  const candidates = shadowQuerySelector(
-    activeFocusGroup,
-    isFocusable,
-    isFocusgroup
-  );
+  const candidates = getCandidates(activeFocusGroup);
 
   // Take no action, there are no candidates in this focusgroup
   if (candidates.length === 0) return;
@@ -162,6 +193,7 @@ function focusNode(activeElement, activeFocusGroup, options, direction, event) {
   if (nodeToFocus) {
     // Key event is handled by the focusgroup, prevent other default events
     event.preventDefault();
+
     if (!options.nomemory) {
       setRovingTabindex(activeElement);
       resetRovingTabindex(nodeToFocus);
@@ -172,6 +204,9 @@ function focusNode(activeElement, activeFocusGroup, options, direction, event) {
   }
 }
 
+/**
+ * Observes changes to the focusgroup attribute and provides lifecycle callbacks
+ */
 class FocusgroupAttribute extends Attribute {
   #options;
 

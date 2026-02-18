@@ -7,6 +7,15 @@ const ROVING_INDICATOR = "data-roving-tabindex";
 // Holds a list of initialized roving tabindex focusgroups
 const rovingFocusgroups = new WeakMap();
 
+/**
+ * Check if an element has been initialised with roving tabindex
+ * @param {Element} element
+ * @returns {boolean}
+ */
+export function isRovingTabindexInitialized(element) {
+  return rovingFocusgroups.has(element);
+}
+
 export function initializeRovingTabindex(element, boundary) {
   // Check if already initialised
   if (rovingFocusgroups.has(element)) return;

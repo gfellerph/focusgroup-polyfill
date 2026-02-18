@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Entry priority Test</title>
+    <link rel="stylesheet" href="../../style.css" />
+    <link rel="stylesheet" href="../tests.css" />
+    <script type="module" src="../../main.js"></script>
+  </head>
+  <body>
+    <h1>Entry priority test</h1>
+    <button id="first-button">first</button>
+    <div focusgroup>
+      <button id="focusgroup-button-1">Button 1</button>
+      <button id="focusgroup-button-2">Button 2</button>
+      <button id="focusgroup-button-3">Button 3</button>
+      <button id="focusgroup-button-4" focusgroup-entry-priority>
+        Button 4 (entry priority)
+      </button>
+      <button id="focusgroup-button-5">Button 5</button>
+    </div>
+  </body>
+</html>
