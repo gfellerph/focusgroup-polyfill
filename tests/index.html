@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -22,7 +22,7 @@
     <button>First focus</button>
 
     <h2>Regular focusgroup</h2>
-    <div focusgroup>
+    <div focusgroup="toolbar">
       <button id="regular-focusgroup-button-1">Button 1</button>
       <input type="text" name="testinput" id="regular-focusgroup-textinput" />
       <button id="regular-focusgroup-button-2">Button 2</button>
@@ -40,7 +40,7 @@
     </div>
 
     <h2>RTL focusgroup</h2>
-    <div dir="rtl" focusgroup>
+    <div dir="rtl" focusgroup="toolbar">
       <button id="rtl-focusgroup-button-1">Button 1</button>
       <button id="rtl-focusgroup-button-2">Button 2</button>
       <button>Button 3</button>
@@ -49,7 +49,7 @@
     </div>
 
     <h2>Horizontal focusgroup</h2>
-    <div focusgroup="inline">
+    <div focusgroup="toolbar inline">
       <button id="horizontal-focusgroup-button-1">Button 1</button>
       <button id="horizontal-focusgroup-button-2">Button 2</button>
       <button>Button 3</button>
@@ -58,7 +58,7 @@
     </div>
 
     <h2>Vertical focusgroup</h2>
-    <div class="vertical" focusgroup="block">
+    <div class="vertical" focusgroup="toolbar block">
       <button id="vertical-focusgroup-button-1">Button 1</button>
       <button id="vertical-focusgroup-button-2">Button 2</button>
       <button>Button 3</button>
@@ -67,7 +67,7 @@
     </div>
 
     <h2>Wrong usage of horizontal and vertical focusgroup</h2>
-    <div focusgroup="inline block">
+    <div focusgroup="toolbar inline block">
       <button id="wrong-hv-focusgroup-button-1">Button 1</button>
       <button id="wrong-hv-focusgroup-button-2">Button 2</button>
       <button>Button 3</button>
@@ -76,7 +76,7 @@
     </div>
 
     <h2>Simple horizontal with extending vertical focusgroups</h2>
-    <div focusgroup="inline">
+    <div focusgroup="toolbar inline">
       <button id="horizontal-extending-vertical-button-1">
         Horizontal button 1
       </button>
@@ -86,7 +86,7 @@
       <button id="horizontal-extending-vertical-button-3">
         Horizontal button 3
       </button>
-      <div class="vertical" focusgroup="block">
+      <div class="vertical" focusgroup="toolbar block">
         <button id="horizontal-extending-vertical-button-3-1">
           Vertical button 3.1
         </button>
@@ -106,11 +106,11 @@
     </div>
 
     <h2>Simple vertical with extending horizontal focusgroup</h2>
-    <div focusgroup="block">
+    <div focusgroup="toolbar block">
       <button>Vertical button 1</button>
       <button>Vertical button 2</button>
       <button>Vertical button 3</button>
-      <div focusgroup="inline">
+      <div focusgroup="toolbar inline">
         <button>Horizontal button 3.1</button>
         <button>Horizontal button 3.2</button>
         <button>Horizontal button 3.3</button>
@@ -120,29 +120,29 @@
     </div>
 
     <h2>Simple all block nested focusgroups</h2>
-    <div focusgroup>
-      <div focusgroup="block">
+    <div focusgroup="toolbar">
+      <div focusgroup="toolbar block">
         <button>Extending button 1</button>
       </div>
-      <div focusgroup="block">
+      <div focusgroup="toolbar block">
         <button>Extending button 2</button>
       </div>
-      <div focusgroup="block">
+      <div focusgroup="toolbar block">
         <button>Extending button 3</button>
       </div>
-      <div focusgroup="block">
+      <div focusgroup="toolbar block">
         <button>Extending button 4</button>
       </div>
-      <div focusgroup="block">
+      <div focusgroup="toolbar block">
         <button>Extending button 5</button>
       </div>
     </div>
 
     <h2 id="vertical-nested">Vertical nested in horizontal</h2>
-    <div class="navigation" focusgroup>
+    <div class="navigation" focusgroup="toolbar">
       <div>
         <button id="vertical-nested-button-1">Button 1</button>
-        <div focusgroup="block">
+        <div focusgroup="toolbar block">
           <a href="#" id="vertical-nested-h-g1-button-1">Nav item 1</a>
           <a href="#" id="vertical-nested-h-g1-button-2">Nav item 2</a>
           <a href="#">Nav item 3</a>
@@ -152,7 +152,7 @@
       </div>
       <div>
         <button id="vertical-nested-button-2">Button 2</button>
-        <div focusgroup="block">
+        <div focusgroup="toolbar block">
           <a href="#" id="vertical-nested-h-g2-button-1">Nav item 1</a>
           <a href="#">Nav item 2</a>
           <a href="#">Nav item 3</a>
@@ -162,7 +162,7 @@
       </div>
       <div>
         <button>Button 3</button>
-        <div focusgroup="block">
+        <div focusgroup="toolbar block">
           <a href="#">Nav item 1</a>
           <a href="#">Nav item 2</a>
           <a href="#">Nav item 3</a>
@@ -173,7 +173,7 @@
     </div>
 
     <h2 id="wrapping-focusgroup">Wrapping focusgroup</h2>
-    <div focusgroup="wrap">
+    <div focusgroup="toolbar wrap">
       <button id="wrapping-focusgroup-button-1">Button 1</button>
       <button id="wrapping-focusgroup-button-2">Button 2</button>
       <button id="wrapping-focusgroup-button-3">Button 3</button>
@@ -185,7 +185,7 @@
     <div>
       <template shadowrootmode="open">
         <link rel="stylesheet" href="style.css" />
-        <div focusgroup part="shadow">
+        <div focusgroup="toolbar" part="shadow">
           <button id="shadow-dom-focusgroup-button-1">Shadow button 1</button>
           <button id="shadow-dom-focusgroup-button-2">Shadow button 2</button>
           <button id="shadow-dom-focusgroup-button-3">Shadow button 3</button>
@@ -199,7 +199,7 @@
     <div>
       <template shadowrootmode="open">
         <link rel="stylesheet" href="style.css" />
-        <div focusgroup part="shadow">
+        <div focusgroup="toolbar" part="shadow">
           <button>Shadow button 1</button>
           <span>
             <template shadowrootmode="open">
@@ -238,7 +238,7 @@
     </div>
 
     <h2>Light dom focusgroup with shadow dom items</h2>
-    <div focusgroup part="shadow">
+    <div focusgroup="toolbar" part="shadow">
       <template shadowrootmode="open">
         <link rel="stylesheet" href="style.css" />
         <button>Shadow button 1</button>
@@ -253,8 +253,8 @@
     <div>
       <template shadowrootmode="open">
         <link rel="stylesheet" href="style.css" />
-        <div part="shadow">
-          <slot focusgroup> </slot>
+        <div focusgroup="toolbar" part="shadow">
+          <slot focusgroup="toolbar"> </slot>
           <slot name="bla"></slot>
         </div>
       </template>
@@ -273,7 +273,7 @@
 
     <h2>Mixed light dom, shadow dom and slotted</h2>
     <p>Complicated use-case</p>
-    <div focusgroup>
+    <div focusgroup="toolbar">
       <button id="mixed-dom-button-1">1</button>
       <button id="mixed-dom-button-2">2</button>
       <span>
@@ -295,7 +295,7 @@
     </div>
 
     <h2>Nested focusgroup</h2>
-    <div focusgroup>
+    <div focusgroup="toolbar">
       <button>Button 1</button>
       <button>Button 2</button>
       <button>Button 3</button>
@@ -311,7 +311,7 @@
     </div>
 
     <h2>Nested shadow focusgroup</h2>
-    <div focusgroup>
+    <div focusgroup="toolbar">
       <button>Button 1</button>
       <button>Button 2</button>
       <button>Button 3</button>
@@ -330,7 +330,7 @@
     </div>
 
     <h2>Deeply nested focusgroup</h2>
-    <div focusgroup>
+    <div focusgroup="toolbar">
       <button>Button 1</button>
       <button>Button 2</button>
       <button>Button 3</button>
@@ -352,7 +352,7 @@
     </div>
 
     <h2>Weird invalid markup example</h2>
-    <div focusgroup>
+    <div focusgroup="toolbar">
       <button>
         I'm a button with links 1
         <span>
@@ -390,7 +390,7 @@
     >
       Set focus to Button 2
     </button>
-    <div focusgroup>
+    <div focusgroup="toolbar">
       <button>Button 1</button>
       <button id="js-interference-button-2">Button 2</button>
       <button>Button 3</button>
@@ -403,14 +403,14 @@
     <button id="dom-interference-remove-button">
       Remove button from focusgroup
     </button>
-    <div focusgroup id="dom-interference-container">
+    <div focusgroup="toolbar" id="dom-interference-container">
       <button>Button 1</button>
       <button>Button 2</button>
       <button>Button 3</button>
     </div>
 
     <h2>Just in time options</h2>
-    <fieldset focusgroup="wrap">
+    <fieldset focusgroup="toolbar wrap">
       <legend>Focusgroup options</legend>
       <input class="jit-toggle" type="checkbox" name="block" id="jit-block" />
       <label for="jit-block">Block</label>
@@ -428,7 +428,7 @@
       <input class="jit-toggle" type="checkbox" name="none" id="jit-none" />
       <label for="jit-none">None</label>
     </fieldset>
-    <div focusgroup id="jit-focusgroup">
+    <div focusgroup="toolbar" id="jit-focusgroup">
       <button>Button 1</button>
       <button>Button 2</button>
       <button>Button 3</button>
@@ -437,7 +437,7 @@
     </div>
 
     <h2>A list of detail summary elements</h2>
-    <div focusgroup="">
+    <div focusgroup="toolbar">
       <details>
         <summary>Summary</summary>
         <summary>Summary</summary>
@@ -459,7 +459,7 @@
 
     <h2>Focusgroup in a popover</h2>
     <button popovertarget="testpopover">Open popover</button>
-    <div popover id="testpopover" focusgroup>
+    <div popover id="testpopover" focusgroup="toolbar">
       <button autofocus id="testpopover-button-1">Button 1</button>
       <button id="testpopover-button-2">Button 2</button>
       <button id="testpopover-button-3">Button 3</button>
@@ -467,7 +467,7 @@
     </div>
 
     <h2>Focusgroup with popover in the middle</h2>
-    <div focusgroup="">
+    <div focusgroup="toolbar">
       <button>Button 1</button>
       <button popovertarget="middlepopover">Open popover</button>
       <div popover id="middlepopover">
@@ -480,7 +480,7 @@
 
     <h2>Focusgroup in a dialog</h2>
     <button onclick="this.nextElementSibling.showModal()">Open dialog</button>
-    <dialog focusgroup>
+    <dialog focusgroup="toolbar">
       <button autofocus id="testdialog-button-1">Button 1</button>
       <button id="testdialog-button-2">Button 2</button>
       <button id="testdialog-button-3">Button 3</button>
@@ -488,19 +488,19 @@
     </dialog>
 
     <h2>Focus entry priority</h2>
-    <div focusgroup id="entry-priority-focusgroup">
+    <div focusgroup="toolbar" id="entry-priority-focusgroup">
       <button>Button 1</button>
-      <button focusgroup-entry-priority>Button 2 (entry priority)</button>
+      <button focusgroupstart>Button 2 (entry priority)</button>
       <button>Button 3</button>
       <button>Button 4</button>
       <button>Button 5</button>
     </div>
 
     <h2>Duplicate entry priority</h2>
-    <div focusgroup id="duplicate-entry-priority-focusgroup">
+    <div focusgroup="toolbar" id="duplicate-entry-priority-focusgroup">
       <button>Button 1</button>
-      <button focusgroup-entry-priority>Button 2 (entry priority)</button>
-      <button focusgroup-entry-priority>
+      <button focusgroupstart>Button 2 (entry priority)</button>
+      <button focusgroupstart>
         Button 3 (second entry priority, should be ignored)
       </button>
       <button>Button 4</button>
@@ -508,25 +508,25 @@
     </div>
 
     <h2>Entry priority with nomemory</h2>
-    <div focusgroup="no-memory" id="entry-priority-nomemory-focusgroup">
+    <div focusgroup="toolbar no-memory" id="entry-priority-nomemory-focusgroup">
       <button>Button 1</button>
-      <button focusgroup-entry-priority>Button 2 (entry priority)</button>
+      <button focusgroupstart>Button 2 (entry priority)</button>
       <button>Button 3</button>
       <button>Button 4</button>
       <button>Button 5</button>
     </div>
 
     <h2>Entry priority with key conflict element</h2>
-    <div focusgroup>
+    <div focusgroup="toolbar">
       <button>Button 1</button>
-      <button focusgroup-entry-priority>Button 3</button>
+      <button focusgroupstart>Button 3</button>
       <button>Button 4</button>
       <label>Conflicting element: <input type="text" /></label>
       <button>Button 5</button>
     </div>
 
     <h2>Different focusable elements</h2>
-    <div focusgroup>
+    <div focusgroup="toolbar">
       <button>Button 1</button>
       <button>Button 2</button>
       <a href="#">Link 1</a>

@@ -46,6 +46,9 @@ export function isFocusgroupCandidate(element) {
   // Ensure the focusgroup options is not none
   if (options.none) return false;
 
+  // Ensure the focusgroup has a valid behavior
+  if (!options.behavior) return false;
+
   // Ensure the element is focusable
   if (!isFocusable(element)) return false;
 
