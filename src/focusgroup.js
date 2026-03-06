@@ -107,7 +107,7 @@ function focusInHandler(focusEvent) {
     activeElement.addEventListener(
       "blur",
       () => activeElement.removeEventListener("keydown", keydownHandler),
-      { once: true }
+      { once: true },
     );
   } else {
     // Focus is on a non-candidate, disable roving tabindex on the parent focusgroup, if any
@@ -142,7 +142,7 @@ function getCandidates(element) {
 function getEntryPriority(focusgroupElement) {
   const candidates = getCandidates(focusgroupElement);
   for (const candidate of candidates) {
-    if (candidate.matches("[focusgroup-entry-priority]")) {
+    if (candidate.matches("[focusgroupstart]")) {
       return candidate;
     }
   }
