@@ -71,6 +71,16 @@ export default defineConfig({
     //   name: 'Google Chrome',
     //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
     // },
+    {
+      name: "chrome-canary",
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: "chrome-canary",
+        launchOptions: {
+          args: ["--enable-experimental-web-platform-features"],
+        },
+      },
+    },
   ],
 
   /* Run your local dev server before starting the tests */
