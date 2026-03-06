@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wrapping Test</title>
+    <link rel="stylesheet" href="../../style.css" />
+    <link rel="stylesheet" href="../tests.css" />
+    <script type="module" src="../../main.js"></script>
+  </head>
+  <body>
+    <h1>Wrapping test</h1>
+    <div focusgroup="toolbar wrap">
+      <button id="wrap-button-1">Button 1</button>
+      <button id="wrap-button-2">Button 2</button>
+      <button id="wrap-button-3">Button 3</button>
+      <button id="wrap-button-4">Button 4</button>
+      <button id="wrap-button-5">Button 5</button>
+    </div>
+
+    <h2>Non-wrapping focusgroup</h2>
+    <div focusgroup="toolbar">
+      <button id="nowrap-button-1">Button 1</button>
+      <button id="nowrap-button-2">Button 2</button>
+      <button id="nowrap-button-3">Button 3</button>
+      <button id="nowrap-button-4">Button 4</button>
+      <button id="nowrap-button-5">Button 5</button>
+    </div>
+
+    <h2>RTL wrapping focusgroup</h2>
+    <div dir="rtl" focusgroup="toolbar wrap">
+      <button id="rtl-wrap-button-1">Button 1</button>
+      <button id="rtl-wrap-button-2">Button 2</button>
+      <button id="rtl-wrap-button-3">Button 3</button>
+      <button id="rtl-wrap-button-4">Button 4</button>
+      <button id="rtl-wrap-button-5">Button 5</button>
+    </div>
+
+    <h2>RTL non-wrapping focusgroup</h2>
+    <div dir="rtl" focusgroup="toolbar">
+      <button id="rtl-nowrap-button-1">Button 1</button>
+      <button id="rtl-nowrap-button-2">Button 2</button>
+      <button id="rtl-nowrap-button-3">Button 3</button>
+      <button id="rtl-nowrap-button-4">Button 4</button>
+      <button id="rtl-nowrap-button-5">Button 5</button>
+    </div>
+  </body>
+</html>
